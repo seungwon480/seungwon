@@ -1,0 +1,1226 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>길메이트</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+    background:#EEF1F5;color:#111827;line-height:1.55;
+    padding:48px 20px 64px;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1560px;margin:0 auto;}
+
+  /* ── 헤더 ── */
+  header{text-align:center;margin-bottom:38px;}
+  .logo{
+    width:54px;height:54px;border-radius:16px;background:#2563EB;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
+  }
+  h1{font-size:40px;font-weight:800;letter-spacing:-.02em;line-height:1.2;}
+  .tagline{margin-top:10px;font-size:17px;color:#5B6472;}
+
+  /* ── 세 줄 ── */
+  .lines{max-width:820px;margin:0 auto 34px;display:flex;flex-direction:column;gap:10px;}
+  .line{
+    background:#fff;border-radius:14px;padding:16px 20px;
+    display:flex;align-items:flex-start;gap:14px;
+  }
+  .ln-no{
+    flex-shrink:0;width:26px;height:26px;border-radius:8px;background:#E8EFFE;
+    color:#2563EB;font-size:13px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;margin-top:2px;
+  }
+  .line b{display:block;font-size:15.5px;font-weight:700;margin-bottom:2px;}
+  .line span{display:block;color:#5B6472;font-size:14.5px;}
+
+  .hint{
+    text-align:center;font-size:14px;font-weight:700;color:#2563EB;margin-bottom:22px;
+    display:flex;align-items:center;justify-content:center;gap:7px;
+  }
+
+  /* ── 화면 묶음 ── */
+  .screens{display:flex;gap:24px;justify-content:center;align-items:flex-start;flex-wrap:wrap;}
+  .screen{width:360px;}
+  .cap{text-align:center;font-size:13.5px;font-weight:700;color:#3C4654;margin-bottom:11px;}
+  .phone{
+    position:relative;
+    width:360px;height:1080px;background:#F4F6F9;border-radius:28px;overflow:hidden;
+    display:flex;flex-direction:column;box-shadow:0 16px 36px rgba(17,24,39,.13);
+  }
+  .view{flex-grow:1;overflow-y:auto;padding:20px 16px 16px;scrollbar-width:none;}
+  .view::-webkit-scrollbar{display:none;}
+
+  /* ── 누를 수 있는 것 ── */
+  [data-go],[data-back],[data-tab],[data-toast],[data-shade],.tg,.seg,.sb,.shade{cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;}
+  [data-go]:active,[data-back]:active,[data-toast]:active,[data-shade]:active,.seg:active,.sb:active{opacity:.6;}
+  [data-go]:focus-visible,[data-back]:focus-visible,[data-tab]:focus-visible,[data-toast]:focus-visible,.tg:focus-visible,.seg:focus-visible{outline:2px solid #2563EB;outline-offset:2px;}
+
+  /* ── 공통 ── */
+  .h-title{font-size:21px;font-weight:800;letter-spacing:-.01em;}
+  .h-sub{font-size:12.5px;color:#6B7280;margin-top:3px;}
+  .card{background:#fff;border-radius:15px;padding:12px;margin-bottom:8px;}
+  .c-head{display:flex;align-items:center;gap:9px;margin-bottom:7px;}
+  .c-no{
+    width:21px;height:21px;border-radius:7px;background:#E8EFFE;color:#2563EB;
+    font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .c-title{font-size:15px;font-weight:700;flex-grow:1;}
+  .c-flag{font-size:11.5px;font-weight:700;color:#15803D;}
+  .c-desc{font-size:11.8px;color:#6B7280;line-height:1.45;margin-bottom:8px;}
+  .label{font-size:11.5px;font-weight:700;color:#3C4654;margin-bottom:6px;}
+
+  .btn{border:none;font-family:inherit;cursor:pointer;font-weight:700;border-radius:10px;}
+  .btn-line{background:#fff;border:1.4px solid #D5DAE2;color:#1F2937;font-size:11.5px;padding:7px 12px;border-radius:9px;}
+  .btn-soft{background:#E8EFFE;color:#2563EB;font-size:12.5px;padding:10px 0;}
+  .btn-fill{background:#2563EB;color:#fff;font-size:12.5px;padding:10px 0;}
+  .btn-ghost{background:transparent;color:#6B7280;font-size:12.5px;padding:10px 0;}
+  .btn-danger{background:#FDECEC;color:#C0392B;font-size:12.5px;padding:10px 0;}
+  .btn-row{display:flex;}
+  .btn-row .btn+.btn{margin-left:8px;}
+  .btn-row .btn{flex:1;}
+  .btn-big{width:100%;font-size:14px;padding:13px 0;border-radius:12px;}
+
+  /* 하위 화면 머리 */
+  .sub-h{display:flex;align-items:center;gap:8px;margin:-4px 0 14px;}
+  .back{
+    width:36px;height:36px;border-radius:11px;background:#fff;color:#2563EB;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .sub-t{font-size:18px;font-weight:800;letter-spacing:-.01em;}
+  .sec-t{font-size:12.5px;font-weight:700;color:#3C4654;margin:14px 2px 7px;}
+  .small{font-size:11px;color:#8B93A0;line-height:1.5;}
+
+  /* 예시 값 칸 (입력창 아님) */
+  .fld{margin-bottom:9px;}
+  .fld .fk{font-size:11px;font-weight:700;color:#6B7280;margin:0 0 4px 2px;}
+  .fld .fv{
+    background:#F4F6F9;border:1.4px solid #E3E7ED;border-radius:10px;
+    padding:9px 11px;font-size:13px;font-weight:600;color:#111827;
+  }
+  .fld .fv.muted{color:#9CA3AF;font-weight:500;}
+  .fld2{display:flex;gap:8px;}
+  .fld2 .fld{flex:1;}
+
+  /* ── 1. 초기 설정 ── */
+  .brand{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;}
+  .brand b{font-size:17px;font-weight:800;}
+  .brand span{font-size:11.5px;color:#8B93A0;}
+  .hero{font-size:21px;font-weight:800;line-height:1.3;letter-spacing:-.02em;}
+  .hero-sub{font-size:12.3px;color:#5B6472;margin:7px 0 11px;line-height:1.45;}
+
+  .perm{display:flex;gap:9px;margin-top:8px;}
+  .chk{flex-shrink:0;margin-top:1px;}
+  .perm b{font-size:12.8px;font-weight:700;}
+  .perm em{font-style:normal;font-size:10.5px;color:#8B93A0;margin-left:4px;}
+  .perm p{font-size:11.5px;color:#6B7280;margin-top:1px;}
+
+  .pin-row{
+    background:#F4F6F9;border-radius:11px;padding:8px 11px;margin-top:7px;
+    display:flex;align-items:center;gap:9px;
+  }
+  .pin-row .grow{flex-grow:1;min-width:0;}
+  .pin-row .k{font-size:10.5px;color:#8B93A0;}
+  .pin-row .v{font-size:13.5px;font-weight:700;}
+
+  .cls{background:#F4F6F9;border-radius:11px;overflow:hidden;margin-bottom:10px;}
+  .cls-row{display:flex;align-items:center;gap:8px;padding:7px 11px;border-bottom:1px solid #E7EBF1;}
+  .cls-row:last-child{border-bottom:none;}
+  .bul{width:6px;height:6px;border-radius:50%;background:#3B5BDB;flex-shrink:0;}
+  .bul.o{background:#D9480F;}
+  .bul.g{background:#0B7A5B;}
+  .cls-row .n{flex-grow:1;font-size:12.8px;font-weight:700;}
+  .cls-row .w{font-size:11.5px;color:#6B7280;}
+
+  /* ── 2. 일정 ── */
+  .chips{display:flex;margin:12px 0;}
+  .chip+.chip{margin-left:8px;}
+  .chip{
+    background:#fff;border:1.4px solid #D5DAE2;border-radius:100px;
+    padding:7px 13px;font-size:12px;font-weight:700;display:flex;align-items:center;
+  }
+  .chip svg{margin-right:5px;}
+  .sug{
+    background:#FFF8E6;border:1.3px solid #F3DFA8;border-radius:13px;
+    padding:11px 12px;display:flex;align-items:center;gap:9px;margin-bottom:12px;
+  }
+  .sug .grow{flex-grow:1;min-width:0;}
+  .sug .q{font-size:12.5px;font-weight:700;line-height:1.35;}
+  .sug .m{font-size:10.8px;color:#8A7B43;margin-top:2px;}
+  .sug .go{
+    background:#fff;border-radius:9px;padding:7px 11px;font-size:12px;font-weight:700;color:#2563EB;flex-shrink:0;
+  }
+  .wknav{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+  .wknav .arw{width:22px;text-align:center;font-size:15px;color:#6B7280;}
+  .wknav .mid{text-align:center;}
+  .wknav .mid b{display:block;font-size:14.5px;font-weight:800;}
+  .wknav .mid span{font-size:10.8px;color:#8B93A0;}
+
+  .grid{background:#fff;border-radius:13px;padding:9px 8px 8px;margin-bottom:9px;}
+  .ghead{display:flex;border-bottom:1px solid #EDF0F4;padding-bottom:7px;}
+  .ghead .sp{width:20px;flex-shrink:0;}
+  .ghead .dc{flex:1;text-align:center;}
+  .ghead .dw{font-size:10px;color:#8B93A0;}
+  .ghead .dd{font-size:12.5px;font-weight:700;margin-top:1px;}
+  .ghead .dc.today .dw{color:#2563EB;}
+  .ghead .dc.today .dd{
+    background:#2563EB;color:#fff;width:21px;height:21px;line-height:21px;
+    border-radius:50%;margin:1px auto 0;
+  }
+  .gbody{display:flex;position:relative;height:624px;margin-top:4px;}
+  .gtime{width:20px;flex-shrink:0;position:relative;}
+  .gtime i{
+    position:absolute;left:0;font-style:normal;font-size:9px;color:#9CA3AF;
+    transform:translateY(-4px);
+  }
+  .gcol{flex:1;position:relative;border-left:1px solid #F0F2F6;}
+  .gcol.today{background:#F3F7FF;}
+  .ev{
+    position:absolute;left:2px;right:2px;border-radius:5px;padding:3px 3px;
+    font-size:8px;font-weight:700;color:#fff;line-height:1.25;overflow:hidden;
+  }
+  .ev.cl{background:#3B5BDB;}
+  .ev.ca{background:#D9480F;}
+  .ev.us{background:#0B7A5B;}
+  .ev.mv{background:#E7EAEF;color:#7A818C;}
+  .ev .tm{font-weight:600;opacity:.92;}
+  .legend{display:flex;justify-content:center;margin-bottom:10px;}
+  .lg{display:flex;align-items:center;font-size:10px;color:#6B7280;margin:0 7px;}
+  .lg .sw-dot{margin-right:4px;}
+  .sw-dot{width:7px;height:7px;border-radius:2px;}
+
+  /* 세부 일정 */
+  .ev-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .ev-name{font-size:19px;font-weight:800;flex-grow:1;}
+  .src{font-size:10.5px;font-weight:700;border-radius:100px;padding:3px 8px;background:#E8EFFE;color:#2B4FA8;}
+  .tripline{font-size:13px;font-weight:700;}
+
+  /* 경로 */
+  .legs{margin-top:9px;}
+  .leg{display:flex;align-items:center;gap:9px;padding:6px 0;}
+  .leg+.leg{border-top:1px dashed #E7EBF1;}
+  .mode{
+    flex-shrink:0;min-width:58px;text-align:center;font-size:10.5px;font-weight:700;
+    border-radius:7px;padding:3px 6px;
+  }
+  .mode.walk{background:#EEF0F3;color:#4B5563;}
+  .mode.bus{background:#DCE7FD;color:#1F4FBF;}
+  .mode.sub{background:#D9F2E1;color:#137A3A;}
+  .leg .lt{flex-grow:1;font-size:12px;color:#374151;line-height:1.4;}
+  .leg .ld{font-size:11.5px;font-weight:700;color:#6B7280;flex-shrink:0;}
+
+  /* 제안 */
+  .sug-card{background:#FFF8E6;border:1.3px solid #F3DFA8;border-radius:13px;padding:12px;margin-bottom:8px;}
+  .sug-card .q{font-size:13.5px;font-weight:800;line-height:1.4;}
+  .sug-card .m{font-size:11.5px;color:#8A7B43;margin-top:3px;}
+  .sug-card .why{font-size:11.5px;color:#5B6472;margin-top:8px;background:#fff;border-radius:9px;padding:8px 10px;}
+  .sug-tag{display:inline-block;font-size:10px;font-weight:700;color:#8A6400;background:#FCEFC7;border-radius:100px;padding:2px 8px;margin-bottom:6px;}
+
+  /* 메시지 */
+  .bubble{
+    background:#FEE500;border-radius:4px 14px 14px 14px;padding:10px 12px;
+    font-size:13px;line-height:1.5;color:#191919;max-width:88%;
+  }
+  .bubble-meta{font-size:10.5px;color:#8B93A0;margin:5px 0 0 2px;}
+  .clip{
+    background:#fff;border:1.4px dashed #B9C7EE;border-radius:13px;padding:11px 12px;margin-bottom:12px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .clip .grow{flex-grow:1;}
+  .clip b{display:block;font-size:12.8px;}
+  .clip span{font-size:11px;color:#6B7280;}
+
+  /* 시간표 스크린샷 모양 */
+  .shot{
+    background:#fff;border:1.4px solid #E3E7ED;border-radius:12px;padding:8px;margin-bottom:10px;
+  }
+  .shot-top{font-size:10.5px;font-weight:700;color:#C0392B;margin:0 0 6px 2px;}
+  .shot-g{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;height:150px;position:relative;}
+  .shot-g div{background:#F4F6F9;border-radius:4px;position:relative;}
+  .shot-g i{
+    position:absolute;left:2px;right:2px;border-radius:4px;font-style:normal;
+    font-size:8px;font-weight:700;color:#fff;padding:2px;line-height:1.2;
+  }
+
+  /* ── 3. 알림 ── */
+  .live{background:#2563EB;border-radius:15px;padding:14px;color:#fff;margin-bottom:14px;}
+  .live .lab{font-size:10.5px;font-weight:700;color:#C5D8FD;}
+  .live .ttl{font-size:16px;font-weight:800;margin-top:3px;}
+  .live .met{font-size:11.5px;color:#C5D8FD;margin-top:3px;}
+  .bus{background:#1D4FD0;border-radius:11px;padding:10px 11px;margin-top:11px;}
+  .bus .st{display:flex;align-items:center;font-size:11.8px;font-weight:700;color:#DBE6FE;}
+  .bus .st svg{margin-right:6px;}
+  .bus .bl{display:flex;justify-content:space-between;font-size:12.5px;margin-top:7px;}
+  .bus .bl b{font-weight:800;}
+  .live .cta{
+    background:#fff;color:#2563EB;border-radius:10px;text-align:center;
+    font-size:12.5px;font-weight:700;padding:10px;margin-top:11px;
+  }
+  .dsec{display:flex;align-items:baseline;margin:0 0 8px 2px;}
+  .dsec b{font-size:16px;font-weight:800;}
+  .dsec span{font-size:11.5px;color:#8B93A0;margin-left:7px;}
+  .nrow{
+    background:#fff;border-radius:12px;padding:10px 11px;margin-bottom:7px;
+    display:flex;align-items:flex-start;gap:9px;border:1.4px solid transparent;
+  }
+  .nrow.now{border-color:#2563EB;}
+  .nrow.dim{background:#F8F9FB;}
+  .nt{font-size:11.5px;font-weight:700;color:#4B5563;width:34px;flex-shrink:0;margin-top:2px;}
+  .bdg{
+    flex-shrink:0;font-size:9.5px;font-weight:700;border-radius:100px;
+    padding:3px 7px;margin-top:1px;
+  }
+  .bdg.wake{background:#F3E2D2;color:#9A5B2B;}
+  .bdg.go{background:#D7E3FC;color:#2B4FA8;}
+  .bdg.stn{background:#E6DAFB;color:#6B35C9;}
+  .bdg.arr{background:#CFEBDF;color:#0B6B4F;}
+  .bdg.nxt{background:#E2E5EA;color:#4B5563;}
+  .nrow .grow{flex-grow:1;min-width:0;}
+  .nrow .n1{font-size:12.8px;font-weight:700;line-height:1.35;}
+  .nrow .n2{font-size:11.2px;color:#8B93A0;margin-top:2px;line-height:1.4;}
+  .nrow .n3{font-size:11.2px;font-weight:700;color:#2563EB;margin-top:2px;}
+  .more{text-align:center;font-size:12px;font-weight:700;color:#2563EB;padding:6px 0;}
+
+  /* 알림 세부 */
+  .ad-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+  .ad-time{font-size:13px;font-weight:700;color:#6B7280;}
+  .ad-title{font-size:18px;font-weight:800;line-height:1.35;}
+  .ad-body{font-size:12.8px;color:#4B5563;margin-top:4px;}
+  .ad-live{font-size:12.8px;font-weight:700;color:#2563EB;margin-top:4px;}
+
+  .push{
+    background:#fff;border-radius:16px;padding:11px 13px;box-shadow:0 6px 18px rgba(17,24,39,.12);
+  }
+  .push-h{display:flex;align-items:center;gap:6px;font-size:10.5px;color:#6B7280;margin-bottom:4px;}
+  .push-ic{width:16px;height:16px;border-radius:5px;background:#2563EB;display:flex;align-items:center;justify-content:center;}
+  .push b{display:block;font-size:13px;line-height:1.35;}
+  .push p{font-size:12px;color:#4B5563;margin-top:1px;line-height:1.4;}
+  .push .pl{font-size:12px;font-weight:700;color:#2563EB;margin-top:1px;}
+
+  /* 상단 알림 내려보기 */
+  .shade{
+    position:absolute;inset:0;z-index:5;background:rgba(17,24,39,.62);
+    padding:14px 12px;display:flex;flex-direction:column;gap:9px;
+    -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+  }
+  .shade-bar{display:flex;justify-content:space-between;color:#fff;font-size:12px;font-weight:700;padding:0 4px 4px;}
+  .shade-hint{text-align:center;color:#D1D5DB;font-size:11px;margin-top:4px;}
+
+  /* ── 4. 알림 설정 ── */
+  .srow{display:flex;align-items:center;gap:10px;}
+  .srow .nm{flex-grow:1;font-size:14px;font-weight:700;}
+  .tg{width:42px;height:25px;border-radius:100px;background:#D5DAE2;position:relative;flex-shrink:0;transition:background .15s;}
+  .tg.on{background:#2563EB;}
+  .tg i{position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#fff;transition:left .15s;}
+  .tg.on i{left:20px;}
+  .segs{display:flex;margin-top:7px;}
+  .seg+.seg{margin-left:6px;}
+  .seg{
+    flex:1;text-align:center;font-size:11.5px;font-weight:700;padding:7px 0;
+    border:1.4px solid #D5DAE2;border-radius:9px;background:#fff;color:#4B5563;
+  }
+  .seg.on{background:#2563EB;border-color:#2563EB;color:#fff;}
+  .hr{height:1px;background:#EDF0F4;margin:10px 0;}
+  .steps{display:flex;margin-top:10px;}
+  .step+.step{margin-left:9px;}
+  .step{flex:1;background:#F4F6F9;border-radius:11px;padding:9px 10px;text-align:center;}
+  .step .k{font-size:10.5px;color:#8B93A0;}
+  .step .ctl{display:flex;align-items:center;justify-content:space-between;margin-top:3px;}
+  .step .ctl .sb{font-size:16px;color:#2563EB;font-weight:700;width:26px;height:26px;line-height:26px;border-radius:8px;}
+  .step .ctl b{font-size:15px;font-weight:800;}
+  .note{font-size:10.8px;color:#8B93A0;line-height:1.5;margin-top:10px;}
+  .applied{
+    background:#E8EFFE;color:#2451C4;border-radius:9px;padding:9px 10px;
+    font-size:11.2px;font-weight:700;margin-top:9px;
+  }
+  .ai-card{background:#fff;border-radius:13px;padding:12px;margin-bottom:8px;}
+  .ai-chg{display:flex;align-items:center;gap:8px;margin:6px 0;}
+  .ai-chg .from{font-size:14px;font-weight:700;color:#9CA3AF;text-decoration:line-through;}
+  .ai-chg .to{font-size:16px;font-weight:800;color:#2563EB;}
+
+  /* ── 하단 탭 ── */
+  .tabs{flex-shrink:0;display:flex;background:#fff;border-top:1px solid #E7EBF1;padding:8px 0 14px;}
+  .tab{flex:1;text-align:center;color:#9CA3AF;}
+  .tab.on{color:#2563EB;}
+  .tab .tl{font-size:10.5px;font-weight:700;margin-top:2px;}
+
+  /* 짧은 안내 */
+  .toast{
+    position:absolute;left:50%;bottom:92px;transform:translate(-50%,8px);z-index:6;
+    background:rgba(17,24,39,.92);color:#fff;font-size:12px;font-weight:600;
+    padding:9px 14px;border-radius:100px;white-space:nowrap;max-width:92%;
+    overflow:hidden;text-overflow:ellipsis;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0);}
+
+  footer{text-align:center;margin-top:50px;font-size:13px;color:#8B93A0;}
+
+  @media (max-width:820px){
+    body{padding:32px 16px 48px;}
+    h1{font-size:28px;}
+    .tagline{font-size:15px;}
+    .screen,.phone{width:100%;max-width:360px;}
+    .phone{height:760px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>
+    </div>
+    <h1>길메이트</h1>
+    <p class="tagline">시간표만 올리면 기상부터 환승까지 알아서 챙기는 통학 비서</p>
+  </header>
+
+  <section class="lines">
+    <div class="line">
+      <div class="ln-no">1</div>
+      <div>
+        <b>한 번만 설정하면 한 학기가 돌아갑니다</b>
+        <span>시간표 스크린샷과 집·학교 주소를 올리면 수업과 일정에 맞춰 기상·출발 시각을 자동으로 계산합니다.</span>
+      </div>
+    </div>
+    <div class="line">
+      <div class="ln-no">2</div>
+      <div>
+        <b>이동 중에는 상단 알림만 보면 됩니다</b>
+        <span>출발 시각, 정류장 도착, 환승, 다음 버스·지하철 도착, 학교 도착 예정, 다음 일정까지 순서대로 전달합니다.</span>
+      </div>
+    </div>
+    <div class="line">
+      <div class="ln-no">3</div>
+      <div>
+        <b>쓸수록 내 리듬에 맞춰집니다</b>
+        <span>“너무 일러요 / 너무 늦어요” 피드백을 반영해 준비 시간과 도착 여유를 자동으로 보정합니다.</span>
+      </div>
+    </div>
+  </section>
+
+  <p class="hint">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11V5a2 2 0 0 1 4 0v5"/><path d="M13 10V8.5a2 2 0 0 1 4 0V12a7 7 0 0 1-7 7h-.5a6 6 0 0 1-4.9-2.6L3 13.2a1.8 1.8 0 0 1 2.9-2.1L9 14"/></svg>
+    화면 속 버튼과 아래 탭을 눌러 보세요
+  </p>
+
+  <section class="screens">
+    <div class="screen"><div class="cap">초기 설정 화면</div><div class="phone" data-start="setup"></div></div>
+    <div class="screen"><div class="cap">일정 화면</div><div class="phone" data-start="schedule"></div></div>
+    <div class="screen"><div class="cap">알림 화면</div><div class="phone" data-start="alerts"></div></div>
+    <div class="screen"><div class="cap">알림 설정 화면</div><div class="phone" data-start="settings"></div></div>
+  </section>
+
+  <footer>서강대 스타트업 연계전공 수업 과제</footer>
+
+</div>
+
+<!-- ═════════════ 화면 템플릿 ═════════════ -->
+
+<!-- 경로: 집 → 학교 -->
+<template id="legs-school">
+  <div class="legs">
+    <div class="leg"><span class="mode walk">걷기</span><span class="lt">신림사거리 정류장까지</span><span class="ld">6분</span></div>
+    <div class="leg"><span class="mode bus">버스 5528</span><span class="lt">신림사거리 → 서울대입구역</span><span class="ld">12분</span></div>
+    <div class="leg"><span class="mode walk">환승</span><span class="lt">서울대입구역 2호선 타는 곳</span><span class="ld">3분</span></div>
+    <div class="leg"><span class="mode sub">2호선</span><span class="lt">서울대입구역 → 교대역</span><span class="ld">10분</span></div>
+    <div class="leg"><span class="mode walk">걷기</span><span class="lt">교대역 → 학교</span><span class="ld">12분</span></div>
+  </div>
+</template>
+
+<!-- 경로: 학교 → 집 -->
+<template id="legs-home">
+  <div class="legs">
+    <div class="leg"><span class="mode walk">걷기</span><span class="lt">학교 → 교대역</span><span class="ld">12분</span></div>
+    <div class="leg"><span class="mode sub">2호선</span><span class="lt">교대역 → 서울대입구역</span><span class="ld">10분</span></div>
+    <div class="leg"><span class="mode walk">환승</span><span class="lt">서울대입구역 버스 정류장</span><span class="ld">3분</span></div>
+    <div class="leg"><span class="mode bus">버스 5528</span><span class="lt">서울대입구역 → 신림사거리</span><span class="ld">12분</span></div>
+    <div class="leg"><span class="mode walk">걷기</span><span class="lt">신림사거리 → 집</span><span class="ld">6분</span></div>
+  </div>
+</template>
+
+<!-- ───── 초기 설정 ───── -->
+<template id="v-setup">
+  <div class="view">
+    <div class="brand"><b>길메이트</b><span>처음 설정</span></div>
+    <div class="hero">출발할 시간을<br>대신 챙겨드릴게요</div>
+    <p class="hero-sub">캘린더와 학교 시간표, 대중교통 정보를 합쳐 기상·출발·환승·도착 알림을 자동으로 만들어 드려요.</p>
+
+    <div class="card">
+      <div class="c-head"><div class="c-no">1</div><div class="c-title">권한 안내</div><div class="c-flag">모두 허용됨</div></div>
+      <div class="perm">
+        <svg class="chk" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.2l2.4 2.4 4.6-4.8"/></svg>
+        <div><b>알림<em>필수</em></b><p>기상·출발·도착 알림을 보내요</p></div>
+      </div>
+      <div class="perm">
+        <svg class="chk" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.2l2.4 2.4 4.6-4.8"/></svg>
+        <div><b>캘린더</b><p>기기 캘린더 일정을 이동 계획에 반영해요</p></div>
+      </div>
+      <div class="perm">
+        <svg class="chk" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.2l2.4 2.4 4.6-4.8"/></svg>
+        <div><b>위치</b><p>집·학교 주소를 설정할 때만 써요</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="c-head"><div class="c-no">2</div><div class="c-title">집과 학교</div></div>
+      <p class="c-desc">주소·건물명으로 검색하거나 현재 위치로 등록해요. 이동 시간 계산의 출발점과 도착점이에요.</p>
+      <div class="pin-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.5-7-11.5A7 7 0 0 1 19 9.5C19 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
+        <div class="grow"><div class="k">집</div><div class="v">관악구 신림동</div></div>
+        <button type="button" class="btn btn-line" data-go="place" data-name="집" data-addr="관악구 신림동">변경</button>
+      </div>
+      <div class="pin-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.5-7-11.5A7 7 0 0 1 19 9.5C19 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
+        <div class="grow"><div class="k">학교</div><div class="v">서초구 서초동</div></div>
+        <button type="button" class="btn btn-line" data-go="place" data-name="학교" data-addr="서초구 서초동">변경</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="c-head"><div class="c-no">3</div><div class="c-title">학교 시간표</div></div>
+      <p class="c-desc">에브리타임 시간표 화면을 캡처해 올리면 AI가 과목·요일·시간·강의실을 읽어요. 저장 전에 고칠 수 있어요.</p>
+      <div class="label">AI가 읽은 수업</div>
+      <div class="cls">
+        <div class="cls-row"><div class="bul"></div><div class="n">자료구조</div><div class="w">월·수 09:00</div></div>
+        <div class="cls-row"><div class="bul"></div><div class="n">선형대수</div><div class="w">월 11:00</div></div>
+        <div class="cls-row"><div class="bul"></div><div class="n">운영체제</div><div class="w">화·목 13:00</div></div>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-soft" data-toast="수업 3개를 저장했어요">수업 저장</button>
+        <button type="button" class="btn btn-line" style="padding:10px 0;font-size:12.5px;" data-go="timetable">스크린샷 다시 선택</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="c-head"><div class="c-no">4</div><div class="c-title">캘린더</div></div>
+      <p class="c-desc">기기 캘린더의 앞으로 2주 일정을 가져와요. 하루 종일 일정은 빼요.</p>
+      <div class="cls" style="margin-bottom:10px;">
+        <div class="cls-row"><div class="bul o"></div><div class="n">동아리 회의</div><div class="w">9/30(수) 18:00</div></div>
+      </div>
+      <button type="button" class="btn btn-line" style="width:100%;padding:10px 0;font-size:12.5px;" data-toast="캘린더 일정 1개를 가져왔어요">다시 가져오기</button>
+    </div>
+
+    <button type="button" class="btn btn-fill btn-big" style="margin-top:6px;" data-tab="schedule" data-toast="앞으로 14일의 이동 계획과 알림을 만들었어요">일정 생성</button>
+    <p class="small" style="text-align:center;margin-top:7px;">앞으로 14일의 이동 계획과 알림을 만들어요</p>
+  </div>
+</template>
+
+<!-- ───── 장소 등록·변경 ───── -->
+<template id="v-place">
+  <div class="view">
+    <div class="sub-h"><div class="back" data-back aria-label="뒤로"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></div><div class="sub-t"><span data-slot="name">장소</span> 설정</div></div>
+    <div class="card">
+      <div class="fld"><div class="fk">주소·건물명 검색</div><div class="fv" data-slot="addr">관악구 신림동</div></div>
+      <div class="label" style="margin-top:4px;">검색 결과</div>
+      <div class="segs" style="flex-direction:column;margin-top:0;">
+        <div class="seg on" style="text-align:left;padding:9px 11px;margin:0 0 6px;"><span data-slot="addr">관악구 신림동</span> · 주민센터 근처</div>
+        <div class="seg" style="text-align:left;padding:9px 11px;margin:0 0 6px;"><span data-slot="addr">관악구 신림동</span> · 신림역 3번 출구</div>
+        <div class="seg" style="text-align:left;padding:9px 11px;margin:0;"><span data-slot="addr">관악구 신림동</span> · 신림사거리 정류장</div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-line btn-big" style="margin-bottom:8px;" data-toast="현재 위치를 찾았어요">
+      현재 위치로 등록
+    </button>
+    <button type="button" class="btn btn-fill btn-big" data-toast="장소를 저장했어요" data-after="back">저장</button>
+  </div>
+</template>
+
+<!-- ───── 시간표 가져오기 ───── -->
+<template id="v-timetable">
+  <div class="view">
+    <div class="sub-h"><div class="back" data-back aria-label="뒤로"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></div><div class="sub-t">학교 시간표</div></div>
+    <p class="c-desc">에브리타임 앱에서 시간표 화면을 캡처한 뒤 골라 주세요. 앱끼리 직접 연결할 수 없어서 스크린샷으로 읽어요.</p>
+    <div class="shot">
+      <div class="shot-top">선택한 스크린샷</div>
+      <div class="shot-g">
+        <div><i style="top:4px;height:30px;background:#E8590C;">자료구조</i><i style="top:52px;height:30px;background:#7048E8;">선형대수</i></div>
+        <div><i style="top:96px;height:30px;background:#1C7ED6;">운영체제</i></div>
+        <div><i style="top:4px;height:30px;background:#E8590C;">자료구조</i></div>
+        <div><i style="top:96px;height:30px;background:#1C7ED6;">운영체제</i></div>
+        <div></div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-line btn-big" style="margin-bottom:10px;" data-toast="AI가 시간표를 다시 읽었어요 · 3과목">스크린샷 선택</button>
+    <div class="card">
+      <div class="label">AI가 읽은 수업 · 눌러서 고칠 수 있어요</div>
+      <div class="cls" style="margin-bottom:0;">
+        <div class="cls-row"><div class="bul"></div><div class="n">자료구조</div><div class="w">월·수 09:00–10:15 · 공학관 301</div></div>
+        <div class="cls-row"><div class="bul"></div><div class="n">선형대수</div><div class="w">월 11:00–12:15 · 이과관 204</div></div>
+        <div class="cls-row"><div class="bul"></div><div class="n">운영체제</div><div class="w">화·목 13:00–14:15 · 공학관 105</div></div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-fill btn-big" data-toast="수업 3개를 저장했어요" data-after="back">수업 저장</button>
+  </div>
+</template>
+
+<!-- ───── 일정 (탭) ───── -->
+<template id="v-schedule" data-tab="schedule">
+  <div class="view">
+    <div class="h-title">일정</div>
+
+    <div class="chips">
+      <div class="chip" data-go="places">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.5-7-11.5A7 7 0 0 1 19 9.5C19 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
+        장소
+      </div>
+      <div class="chip" data-go="timetable">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg>
+        시간표
+      </div>
+    </div>
+
+    <div class="sug">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C99A2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6h5.4c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z"/></svg>
+      <div class="grow">
+        <div class="q">“알바”를 매주 반복 일정으로 만들까요?</div>
+        <div class="m">4주 연속, 월요일 15:00쯤 · 제안 1개 더</div>
+      </div>
+      <div class="go" data-go="suggests">보기</div>
+    </div>
+
+    <div class="wknav">
+      <div class="arw" data-toast="지난주 일정이에요">‹</div>
+      <div class="mid"><b>9월 28일 – 10월 4일</b><span>이번 주</span></div>
+      <div class="arw" data-toast="다음 주 일정은 2주 안까지 만들어져 있어요">›</div>
+    </div>
+
+    <div class="grid">
+      <div class="ghead">
+        <div class="sp"></div>
+        <div class="dc"><div class="dw">월</div><div class="dd">28</div></div>
+        <div class="dc"><div class="dw">화</div><div class="dd">29</div></div>
+        <div class="dc today"><div class="dw">수</div><div class="dd">30</div></div>
+        <div class="dc"><div class="dw">목</div><div class="dd">1</div></div>
+        <div class="dc"><div class="dw">금</div><div class="dd">2</div></div>
+        <div class="dc"><div class="dw">토</div><div class="dd">3</div></div>
+        <div class="dc"><div class="dw">일</div><div class="dd">4</div></div>
+      </div>
+      <div class="gbody">
+        <div class="gtime">
+          <i style="top:0px;">8</i><i style="top:52px;">9</i><i style="top:104px;">10</i>
+          <i style="top:156px;">11</i><i style="top:208px;">12</i><i style="top:260px;">13</i>
+          <i style="top:312px;">14</i><i style="top:364px;">15</i><i style="top:416px;">16</i>
+          <i style="top:468px;">17</i><i style="top:520px;">18</i><i style="top:572px;">19</i>
+          <i style="top:624px;">20</i>
+        </div>
+        <div class="gcol">
+          <div class="ev mv" style="top:15px;height:37px;">이동</div>
+          <div class="ev cl" style="top:52px;height:65px;" data-go="event" data-title="자료구조" data-src="시간표" data-when="월·수 09:00–10:15" data-rep="매주" data-place="학교 · 공학관 301" data-tripline="집 08:07 출발 → 08:50 도착 · 43분" data-trip="school">자료구조<div class="tm">09:00</div></div>
+          <div class="ev cl" style="top:156px;height:65px;" data-go="event" data-title="선형대수" data-src="시간표" data-when="월 11:00–12:15" data-rep="매주" data-place="학교 · 이과관 204" data-tripline="앞 수업과 같은 학교 · 이동 없음">선형대수<div class="tm">11:00</div></div>
+          <div class="ev mv" style="top:325px;height:39px;">이동</div>
+          <div class="ev us" style="top:364px;height:208px;" data-go="event" data-title="알바" data-src="직접 입력" data-when="월 15:00–19:00" data-rep="이번 주만 (반복 제안 있음)" data-place="기타 · 봉천동 카페" data-tripline="학교 14:15 출발 → 14:50 도착 · 35분">알바<div class="tm">15:00</div></div>
+          <div class="ev mv" style="top:572px;height:39px;">이동</div>
+        </div>
+        <div class="gcol">
+          <div class="ev mv" style="top:221px;height:39px;">이동</div>
+          <div class="ev cl" style="top:260px;height:65px;" data-go="event" data-title="운영체제" data-src="시간표" data-when="화·목 13:00–14:15" data-rep="매주" data-place="학교 · 공학관 105" data-tripline="집 12:07 출발 → 12:50 도착 · 43분" data-trip="school">운영체제<div class="tm">13:00</div></div>
+          <div class="ev mv" style="top:325px;height:39px;">이동</div>
+        </div>
+        <div class="gcol today">
+          <div class="ev mv" style="top:15px;height:37px;">이동</div>
+          <div class="ev cl" style="top:52px;height:65px;" data-go="event" data-title="자료구조" data-src="시간표" data-when="월·수 09:00–10:15" data-rep="매주" data-place="학교 · 공학관 301" data-tripline="집 08:07 출발 → 08:50 도착 · 43분" data-trip="school">자료구조<div class="tm">09:00</div></div>
+          <div class="ev ca" style="top:520px;height:78px;" data-go="event" data-title="동아리 회의" data-src="캘린더" data-when="9월 30일(수) 18:00–19:30" data-rep="한 번" data-place="학교 · 학생회관" data-tripline="학교에 머무름 · 끝나고 19:30 귀가 (43분)">동아리 회의<div class="tm">18:00</div></div>
+          <div class="ev mv" style="top:598px;height:26px;">이동</div>
+        </div>
+        <div class="gcol">
+          <div class="ev mv" style="top:221px;height:39px;">이동</div>
+          <div class="ev cl" style="top:260px;height:65px;" data-go="event" data-title="운영체제" data-src="시간표" data-when="화·목 13:00–14:15" data-rep="매주" data-place="학교 · 공학관 105" data-tripline="집 12:07 출발 → 12:50 도착 · 43분" data-trip="school">운영체제<div class="tm">13:00</div></div>
+          <div class="ev mv" style="top:325px;height:39px;">이동</div>
+        </div>
+        <div class="gcol">
+          <div class="ev mv" style="top:472px;height:39px;">이동</div>
+          <div class="ev us" style="top:520px;height:78px;" data-go="event" data-title="저녁 약속" data-src="메시지 공유" data-when="10월 2일(금) 18:00–19:30" data-rep="한 번" data-place="기타 · 신촌역 근처" data-tripline="집 17:05 출발 → 17:50 도착 · 45분">저녁 약속<div class="tm">18:00</div></div>
+        </div>
+        <div class="gcol"></div>
+        <div class="gcol"></div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="lg"><div class="sw-dot" style="background:#3B5BDB;"></div>수업</div>
+      <div class="lg"><div class="sw-dot" style="background:#D9480F;"></div>캘린더</div>
+      <div class="lg"><div class="sw-dot" style="background:#0B7A5B;"></div>직접 입력</div>
+      <div class="lg"><div class="sw-dot" style="background:#D8DCE3;"></div>이동</div>
+    </div>
+
+    <div class="btn-row">
+      <button type="button" class="btn btn-fill" data-go="new">일정 등록</button>
+      <button type="button" class="btn btn-soft" data-toast="앞으로 14일 이동 계획을 다시 만들었어요">이동 계획 다시 생성</button>
+    </div>
+  </div>
+</template>
+
+<!-- ───── 세부 일정 ───── -->
+<template id="v-event">
+  <div class="view">
+    <div class="sub-h"><div class="back" data-back aria-label="뒤로"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></div><div class="sub-t">세부 일정</div></div>
+    <div class="card">
+      <div class="ev-head"><div class="ev-name" data-slot="title">일정</div><span class="src" data-slot="src">시간표</span></div>
+      <div class="fld"><div class="fk">시간</div><div class="fv" data-slot="when"></div></div>
+      <div class="fld"><div class="fk">반복</div><div class="fv" data-slot="rep"></div></div>
+      <div class="fld" style="margin-bottom:0;"><div class="fk">장소</div><div class="fv" data-slot="place"></div></div>
+    </div>
+    <div class="sec-t">이동 계획</div>
+    <div class="card">
+      <div class="tripline" data-slot="tripline"></div>
+      <div data-if="trip=school"><div data-use="legs-school"></div></div>
+    </div>
+    <div class="btn-row" style="margin-top:6px;">
+      <button type="button" class="btn btn-soft" data-go="new">일정 수정</button>
+      <button type="button" class="btn btn-danger" data-toast="일정을 삭제하고 이동 계획을 다시 만들었어요" data-after="back">일정 삭제</button>
+    </div>
+  </div>
+</template>
+
+<!-- ───── 일정 등록 ───── -->
+<template id="v-new">
+  <div class="view">
+    <div class="sub-h"><div class="back" data-back aria-label="뒤로"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></div><div class="sub-t">일정 등록</div></div>
+
+    <div class="clip">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="4" width="13" height="16" rx="2"/><path d="M4 8v11a2 2 0 0 0 2 2h9"/></svg>
+      <div class="grow"><b>메시지로 받은 약속이 있나요?</b><span>복사하거나 길메이트로 공유하면 AI가 읽어요</span></div>
+      <button type="button" class="btn btn-soft" style="padding:8px 11px;font-size:11.5px;" data-go="import">가져오기</button>
+    </div>
+
+    <div class="card">
+      <div class="fld"><div class="fk">제목</div><div class="fv">스터디</div></div>
+      <div class="fld2">
+        <div class="fld"><div class="fk">날짜</div><div class="fv">10월 2일 (금)</div></div>
+        <div class="fld"><div class="fk">반복</div><div class="fv">한 번</div></div>
+      </div>
+      <div class="fld2">
+        <div class="fld"><div class="fk">시작</div><div class="fv">16:00</div></div>
+        <div class="fld"><div class="fk">종료</div><div class="fv">17:30</div></div>
+      </div>
+      <div class="fk" style="font-size:11px;font-weight:700;color:#6B7280;margin:2px 0 0 2px;">장소</div>
+      <div class="segs" style="margin-top:4px;">
+        <div class="seg">집</div><div class="seg on">학교</div><div class="seg">기타 장소</div>
+      </div>
+      <div class="fld" style="margin:9px 0 0;"><div class="fk">메모</div><div class="fv muted">중앙도서관 3층</div></div>
+    </div>
+    <p class="small" style="margin:2px 2px 10px;">저장하면 이 일정까지 가는 이동 계획과 알림이 자동으로 만들어져요.</p>
+    <button type="button" class="btn btn-fill btn-big" data-toast="일정을 저장하고 알림을 만들었어요" data-after="back">저장</button>
+  </div>
+</template>
+
+<!-- ───── 메시지에서 가져오기 ───── -->
+<template id="v-import">
+  <div class="view">
+    <div class="sub-h"><div class="back" data-back aria-label="뒤로"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></div><div class="sub-t">메시지에서 가져오기</div></div>
+    <div class="sec-t" style="margin-top:0;">공유받은 메시지</div>
+    <div class="bubble">이번 주 금요일 저녁 6시에 신촌역 2번 출구 앞에서 보자! 저녁 먹고 영화 보러 가자</div>
+    <div class="bubble-meta">카카오톡에서 공유됨 · 보낸 사람 정보는 읽지 않아요</div>
+
+    <div class="sec-t">AI가 읽은 일정</div>
+    <div class="card">
+      <div class="fld"><div class="fk">제목</div><div class="fv">저녁 약속</div></div>
+      <div class="fld2">
+        <div class="fld"><div class="fk">날짜</div><div class="fv">10월 2일 (금)</div></div>
+        <div class="fld"><div class="fk">시간</div><div class="fv">18:00–19:30</div></div>
+      </div>
+      <div class="fld" style="margin-bottom:0;"><div class="fk">장소</div><div class="fv">신촌역 2번 출구</div></div>
+    </div>
+    <p class="small" style="margin:2px 2px 10px;">저장을 누르기 전에는 일정에 들어가지 않아요. 틀린 곳은 눌러서 고칠 수 있어요.</p>
+    <div class="btn-row">
+      <button type="button" class="btn btn-fill" data-toast="“저녁 약속”을 일정에 저장했어요" data-after="tab:schedule">일정으로 저장</button>
+      <button type="button" class="btn btn-ghost" data-back>취소</button>
+    </div>
+  </div>
+</template>
+
+<!-- ───── 제안 목록 ───── -->
+<template id="v-suggests">
+  <div class="view">
+    <div class="sub-h"><div class="back" data-back aria-label="뒤로"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></div><div class="sub-t">AI 제안 2개</div></div>
+    <p class="c-desc">직접 등록한 일정과 위치 기록에서 반복되는 패턴을 찾았어요. 수락하기 전에는 일정에 넣지 않아요.</p>
+
+    <div class="sug-card" data-go="suggest" data-kind="repeat">
+      <span class="sug-tag">반복 일정</span>
+      <div class="q">“알바”를 매주 반복 일정으로 만들까요?</div>
+      <div class="m">4주 연속, 월요일 15:00쯤</div>
+    </div>
+
+    <div class="sug-card" data-go="suggest" data-kind="place">
+      <span class="sug-tag">자주 가는 곳 발견</span>
+      <div class="q">목요일 저녁마다 머무는 곳이 있어요</div>
+      <div class="m">3주 연속, 목요일 19:00–20:30쯤 · 봉천동 근처</div>
+    </div>
+  </div>
+</template>
+
+<!-- ───── 제안 수락 ───── -->
+<template id="v-suggest">
+  <div class="view">
+    <div class="sub-h"><div class="back" data-back aria-label="뒤로"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></div><div class="sub-t">일정 제안</div></div>
+
+    <div data-if="kind=repeat">
+      <div class="sug-card">
+        <span class="sug-tag">반복 일정</span>
+        <div class="q">“알바”를 매주 반복 일정으로 만들까요?</div>
+        <div class="why">직접 입력한 “알바”가 최근 4주 동안 매주 월요일 15:00쯤에 있었어요.</div>
+      </div>
+      <div class="card">
+        <div class="fld"><div class="fk">제목</div><div class="fv">알바</div></div>
+        <div class="fk" style="font-size:11px;font-weight:700;color:#6B7280;margin:0 0 0 2px;">요일</div>
+        <div class="segs" style="margin:4px 0 9px;">
+          <div class="seg on">월</div><div class="seg">화</div><div class="seg">수</div><div class="seg">목</div><div class="seg">금</div><div class="seg">토</div><div class="seg">일</div>
+        </div>
+        <div class="fld2">
+          <div class="fld"><div class="fk">시작</div><div class="fv">15:00</div></div>
+          <div class="fld" style="margin-bottom:0;"><div class="fk">종료</div><div class="fv">19:00</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div data-if="kind=place">
+      <div class="sug-card">
+        <span class="sug-tag">자주 가는 곳 발견</span>
+        <div class="q">목요일 저녁마다 머무는 곳이 있어요</div>
+        <div class="why">위치 기록을 보니 3주 연속 목요일 19:00–20:30쯤 봉천동 근처에 머물렀어요. 등록한 장소가 아니에요.</div>
+      </div>
+      <div class="card">
+        <div class="fld"><div class="fk">여기서 하는 일</div><div class="fv">헬스</div></div>
+        <div class="fld2">
+          <div class="fld"><div class="fk">시작</div><div class="fv">19:00</div></div>
+          <div class="fld"><div class="fk">종료</div><div class="fv">20:30</div></div>
+        </div>
+        <div class="srow" style="margin-top:2px;"><div class="nm" style="font-size:12.8px;">자주 가는 장소로 등록</div><div class="tg on" aria-label="자주 가는 장소로 등록"><i></i></div></div>
+        <div class="fld" style="margin:9px 0 0;"><div class="fk">장소 이름</div><div class="fv">봉천동 피트니스</div></div>
+      </div>
+    </div>
+
+    <button type="button" class="btn btn-fill btn-big" style="margin-top:4px;margin-bottom:6px;" data-toast="매주 반복 일정으로 추가했어요" data-after="tab:schedule">일정으로 추가</button>
+    <button type="button" class="btn btn-ghost btn-big" data-toast="이 제안은 다시 묻지 않을게요" data-after="back">이 제안 거절</button>
+  </div>
+</template>
+
+<!-- ───── 장소 목록 ───── -->
+<template id="v-places">
+  <div class="view">
+    <div class="sub-h"><div class="back" data-back aria-label="뒤로"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></div><div class="sub-t">장소</div></div>
+    <div class="card">
+      <div class="pin-row" style="margin-top:0;">
+        <div class="grow"><div class="k">집</div><div class="v">관악구 신림동</div></div>
+        <button type="button" class="btn btn-line" data-go="place" data-name="집" data-addr="관악구 신림동">변경</button>
+      </div>
+      <div class="pin-row">
+        <div class="grow"><div class="k">학교</div><div class="v">서초구 서초동</div></div>
+        <button type="button" class="btn btn-line" data-go="place" data-name="학교" data-addr="서초구 서초동">변경</button>
+      </div>
+      <div class="pin-row">
+        <div class="grow"><div class="k">기타 장소</div><div class="v">봉천동 카페</div></div>
+        <button type="button" class="btn btn-line" data-toast="장소를 삭제했어요">삭제</button>
+      </div>
+      <button type="button" class="btn btn-soft" style="width:100%;margin-top:9px;" data-go="place" data-name="기타 장소" data-addr="장소 이름이나 주소">장소 추가</button>
+    </div>
+
+    <div class="card" style="display:flex;align-items:center;gap:10px;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7"/></svg>
+      <div style="flex-grow:1;">
+        <div style="font-size:13.5px;font-weight:700;">위치 학습</div>
+        <div class="small" style="color:#6B7280;">도착 감지 · 자주 가는 곳 발견</div>
+      </div>
+      <button type="button" class="btn btn-line" data-go="location">설정하기</button>
+    </div>
+
+    <button type="button" class="btn btn-fill btn-big" data-toast="바뀐 장소로 이동 계획을 다시 만들었어요" data-after="back">변경사항 반영</button>
+  </div>
+</template>
+
+<!-- ───── 위치 학습 ───── -->
+<template id="v-location">
+  <div class="view">
+    <div class="sub-h"><div class="back" data-back aria-label="뒤로"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></div><div class="sub-t">위치 학습</div></div>
+    <div class="card" style="background:#F0F5FF;">
+      <p style="font-size:12.5px;line-height:1.6;">길메이트는 <b>앱이 닫혀 있거나 사용 중이 아닐 때도</b> 위치 정보를 수집해 아래 기능에 써요.</p>
+      <p style="font-size:12px;line-height:1.6;color:#4B5563;margin-top:6px;">• <b>목적지 도착 알림</b> — 집·학교 등 등록한 장소에 도착하면 다음 일정을 알려 드려요<br>• <b>반복 일정 제안</b> — 매주 규칙적으로 가는 장소를 찾아 일정으로 제안해요</p>
+    </div>
+
+    <div class="card">
+      <div class="srow"><div class="nm">도착 감지</div><div class="tg on" aria-label="도착 감지"><i></i></div></div>
+      <p class="c-desc" style="margin:4px 0 0;">등록한 장소 근처에 들어가면 다음 일정을 알려 줘요.</p>
+      <div class="hr"></div>
+      <div class="srow"><div class="nm">자주 가는 곳 발견</div><div class="tg on" aria-label="자주 가는 곳 발견"><i></i></div></div>
+      <p class="c-desc" style="margin:4px 0 0;">3주 이상 같은 시간에 머문 곳을 찾아 제안해요.</p>
+    </div>
+
+    <div class="card">
+      <div class="label">위치 기록은 이렇게 다뤄요</div>
+      <p class="small" style="color:#4B5563;">• 폰 밖으로 보내지 않아요<br>• 8주가 지나면 자동으로 지워요<br>• 밤 22시~새벽 5시에 머문 곳은 추론하지 않아요<br>• 1초마다 따라다니지 않고, 크게 움직였을 때만 기록해요</p>
+    </div>
+
+    <div class="btn-row">
+      <button type="button" class="btn btn-soft" data-toast="새 제안 1개를 찾았어요">제안 다시 찾기</button>
+      <button type="button" class="btn btn-ghost" data-toast="위치 기록을 모두 지웠어요">기록 전체 삭제</button>
+    </div>
+  </div>
+</template>
+
+<!-- ───── 알림 (탭) ───── -->
+<template id="v-alerts" data-tab="alerts">
+  <div class="view">
+    <div class="h-title" style="margin-bottom:13px;">알림</div>
+
+    <div class="live">
+      <div class="lab">지금 이동 중</div>
+      <div class="ttl">학교 · 자료구조 09:00</div>
+      <div class="met">출발 08:07 · 도착 예정 08:50 · 43분</div>
+      <div class="bus">
+        <div class="st">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DBE6FE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="12" rx="2"/><path d="M4 11h16"/><circle cx="8" cy="19" r="1.3" fill="#DBE6FE" stroke="none"/><circle cx="16" cy="19" r="1.3" fill="#DBE6FE" stroke="none"/></svg>
+          신림사거리 · 5528
+        </div>
+        <div class="bl"><span>5528</span><b>3분 후</b></div>
+        <div class="bl"><span>5528</span><b>11분 후</b></div>
+      </div>
+      <div class="cta" data-shade>상단 알림으로 보기</div>
+    </div>
+
+    <div class="dsec"><b>오늘</b><span>9월 30일 (수)</span></div>
+
+    <div class="nrow dim" data-go="alert" data-time="07:27" data-kind="기상" data-kc="wake" data-title="기상 알람" data-body="08:07 출발 · 자료구조 09:00 (학교)" data-route="school" data-ev="ds">
+      <div class="nt">07:27</div><div class="bdg wake">기상</div>
+      <div class="grow"><div class="n1">기상 알람</div><div class="n2">08:07 출발 · 자료구조 09:00 (학교)</div></div>
+    </div>
+    <div class="nrow dim" data-go="alert" data-time="08:07" data-kind="출발" data-kc="go" data-title="학교로 출발할 시간" data-body="자료구조 09:00 · 이동 43분" data-route="school" data-ev="ds">
+      <div class="nt">08:07</div><div class="bdg go">출발</div>
+      <div class="grow"><div class="n1">학교로 출발할 시간</div><div class="n2">자료구조 09:00 · 이동 43분</div></div>
+    </div>
+    <div class="nrow dim" data-go="alert" data-time="08:13" data-kind="정류장·역" data-kc="stn" data-title="신림사거리 도착" data-body="5528 탑승 → 서울대입구역" data-live="5528 2분 후 도착 · 다음 차 10분 후" data-route="school" data-ev="ds">
+      <div class="nt">08:13</div><div class="bdg stn">정류장·역</div>
+      <div class="grow"><div class="n1">신림사거리 도착</div><div class="n2">5528 탑승 → 서울대입구역</div><div class="n3">5528 2분 후 도착 · 다음 차 10분 후</div></div>
+    </div>
+    <div class="nrow now" data-go="alert" data-time="08:23" data-kind="정류장·역" data-kc="stn" data-title="곧 서울대입구역 환승" data-body="내려서 2호선 탑승 → 교대역" data-live="2호선 교대 방면 5분 후 도착" data-route="school" data-ev="ds">
+      <div class="nt">08:23</div><div class="bdg stn">정류장·역</div>
+      <div class="grow"><div class="n1">곧 서울대입구역 환승</div><div class="n2">내려서 2호선 탑승 → 교대역</div><div class="n3">2호선 교대 방면 5분 후 도착</div></div>
+    </div>
+    <div class="nrow" data-go="alert" data-time="08:50" data-kind="도착" data-kc="arr" data-title="학교 도착 예정" data-body="지금: 자료구조 09:00 · 다음: 동아리 회의 18:00" data-ev="ds">
+      <div class="nt">08:50</div><div class="bdg arr">도착</div>
+      <div class="grow"><div class="n1">학교 도착 예정</div><div class="n2">지금: 자료구조 09:00 · 다음: 동아리 회의 18:00</div></div>
+    </div>
+    <div class="nrow" data-go="alert" data-time="17:45" data-kind="다음 일정" data-kc="nxt" data-title="다음 일정: 동아리 회의" data-body="18:00 · 학생회관" data-ev="club">
+      <div class="nt">17:45</div><div class="bdg nxt">다음 일정</div>
+      <div class="grow"><div class="n1">다음 일정: 동아리 회의</div><div class="n2">18:00 · 학생회관</div></div>
+    </div>
+    <div class="nrow" data-go="alert" data-time="19:30" data-kind="출발" data-kc="go" data-title="오늘 일정 끝 · 귀가" data-body="집까지 43분" data-route="home" data-ev="club">
+      <div class="nt">19:30</div><div class="bdg go">출발</div>
+      <div class="grow"><div class="n1">오늘 일정 끝 · 귀가</div><div class="n2">집까지 43분</div></div>
+    </div>
+
+    <div class="dsec" style="margin-top:14px;"><b>내일</b><span>10월 1일 (목)</span></div>
+    <div class="nrow" data-go="alert" data-time="11:27" data-kind="기상" data-kc="wake" data-title="기상 알람" data-body="12:07 출발 · 운영체제 13:00 (학교)" data-route="school" data-ev="os">
+      <div class="nt">11:27</div><div class="bdg wake">기상</div>
+      <div class="grow"><div class="n1">기상 알람</div><div class="n2">12:07 출발 · 운영체제 13:00 (학교)</div></div>
+    </div>
+    <div class="nrow" data-go="alert" data-time="12:07" data-kind="출발" data-kc="go" data-title="학교로 출발할 시간" data-body="운영체제 13:00 · 이동 43분" data-route="school" data-ev="os">
+      <div class="nt">12:07</div><div class="bdg go">출발</div>
+      <div class="grow"><div class="n1">학교로 출발할 시간</div><div class="n2">운영체제 13:00 · 이동 43분</div></div>
+    </div>
+    <div class="more" data-toast="내일 알림은 정류장·환승·도착 3개가 더 있어요">내일 알림 3개 더</div>
+  </div>
+</template>
+
+<!-- ───── 알림 세부정보 ───── -->
+<template id="v-alert">
+  <div class="view">
+    <div class="sub-h"><div class="back" data-back aria-label="뒤로"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></div><div class="sub-t">알림 세부정보</div></div>
+
+    <div class="card">
+      <div class="ad-top"><span class="bdg" data-addclass="kc" data-slot="kind">알림</span><span class="ad-time" data-slot="time"></span></div>
+      <div class="ad-title" data-slot="title"></div>
+      <div class="ad-body" data-slot="body"></div>
+      <div class="ad-live" data-if="live" data-slot="live"></div>
+    </div>
+
+    <div class="sec-t">휴대폰 상단에는 이렇게 떠요</div>
+    <div class="push">
+      <div class="push-h"><span class="push-ic"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></span>길메이트 · <span data-slot="time"></span></div>
+      <b data-slot="title"></b>
+      <p data-slot="body"></p>
+      <div class="pl" data-if="live" data-slot="live"></div>
+    </div>
+
+    <div data-if="route=school">
+      <div class="sec-t">이동 경로 · 43분</div>
+      <div class="card"><div data-use="legs-school"></div></div>
+    </div>
+    <div data-if="route=home">
+      <div class="sec-t">귀가 경로 · 43분</div>
+      <div class="card"><div data-use="legs-home"></div></div>
+    </div>
+
+    <div class="sec-t">이 알림 시각 어땠나요?</div>
+    <div class="card">
+      <div class="btn-row">
+        <button type="button" class="btn btn-line" style="padding:10px 0;font-size:12px;" data-toast="반영했어요 · 다음부터 10분 늦게 알려 드릴게요">너무 일러요</button>
+        <button type="button" class="btn btn-line" style="padding:10px 0;font-size:12px;" data-toast="반영했어요 · 지금 시각을 유지할게요">적당해요</button>
+        <button type="button" class="btn btn-line" style="padding:10px 0;font-size:12px;" data-toast="반영했어요 · 다음부터 10분 일찍 알려 드릴게요">너무 늦어요</button>
+      </div>
+      <p class="small" style="margin-top:7px;">“너무 늦어요”를 고르면 다음부터 10분 일찍 알려 드려요. 알림 설정의 시간 여유에 반영돼요.</p>
+    </div>
+
+    <div class="btn-row" style="margin-top:4px;">
+      <button type="button" class="btn btn-soft" data-if="ev=ds" data-go="event" data-title="자료구조" data-src="시간표" data-when="월·수 09:00–10:15" data-rep="매주" data-place="학교 · 공학관 301" data-tripline="집 08:07 출발 → 08:50 도착 · 43분" data-trip="school">일정 보기</button>
+      <button type="button" class="btn btn-soft" data-if="ev=os" data-go="event" data-title="운영체제" data-src="시간표" data-when="화·목 13:00–14:15" data-rep="매주" data-place="학교 · 공학관 105" data-tripline="집 12:07 출발 → 12:50 도착 · 43분" data-trip="school">일정 보기</button>
+      <button type="button" class="btn btn-soft" data-if="ev=club" data-go="event" data-title="동아리 회의" data-src="캘린더" data-when="9월 30일(수) 18:00–19:30" data-rep="한 번" data-place="학교 · 학생회관" data-tripline="학교에 머무름 · 끝나고 19:30 귀가 (43분)">일정 보기</button>
+      <button type="button" class="btn btn-ghost" data-toast="이 알림만 껐어요" data-after="back">이 알림만 끄기</button>
+    </div>
+  </div>
+</template>
+
+<!-- ───── 알림 설정 (탭) ───── -->
+<template id="v-settings" data-tab="settings">
+  <div class="view">
+    <div class="h-title" style="margin-bottom:13px;">알림 설정</div>
+
+    <div class="card">
+      <div class="c-title" style="margin-bottom:4px;">알림 종류별 설정</div>
+      <p class="c-desc" style="margin-bottom:0;">끈 알림은 예약되지 않아요. 기상 알람은 방해금지 시간대에도 울려요.</p>
+      <div class="hr"></div>
+
+      <div class="srow"><div class="nm">기상</div><div class="tg on" aria-label="기상 알림"><i></i></div></div>
+      <div class="segs"><div class="seg" data-snd="기본">기본</div><div class="seg" data-snd="차임">차임</div><div class="seg on" data-snd="벨">벨</div><div class="seg" data-snd="무음">무음</div></div>
+      <div class="hr"></div>
+
+      <div class="srow"><div class="nm">출발</div><div class="tg on" aria-label="출발 알림"><i></i></div></div>
+      <div class="segs"><div class="seg" data-snd="기본">기본</div><div class="seg on" data-snd="차임">차임</div><div class="seg" data-snd="벨">벨</div><div class="seg" data-snd="무음">무음</div></div>
+      <div class="hr"></div>
+
+      <div class="srow"><div class="nm">정류장·역</div><div class="tg on" aria-label="정류장·역 알림"><i></i></div></div>
+      <div class="segs"><div class="seg on" data-snd="기본">기본</div><div class="seg" data-snd="차임">차임</div><div class="seg" data-snd="벨">벨</div><div class="seg" data-snd="무음">무음</div></div>
+      <div class="hr"></div>
+
+      <div class="srow"><div class="nm">도착</div><div class="tg on" aria-label="도착 알림"><i></i></div></div>
+      <div class="segs"><div class="seg on" data-snd="기본">기본</div><div class="seg" data-snd="차임">차임</div><div class="seg" data-snd="벨">벨</div><div class="seg" data-snd="무음">무음</div></div>
+      <div class="hr"></div>
+
+      <div class="srow"><div class="nm">다음 일정</div><div class="tg on" aria-label="다음 일정 알림"><i></i></div></div>
+      <div class="segs"><div class="seg on" data-snd="기본">기본</div><div class="seg" data-snd="차임">차임</div><div class="seg" data-snd="벨">벨</div><div class="seg" data-snd="무음">무음</div></div>
+    </div>
+
+    <div class="card">
+      <div class="srow"><div class="nm">방해금지 시간대</div><div class="tg on" aria-label="방해금지 시간대"><i></i></div></div>
+      <p class="c-desc" style="margin:7px 0 0;">이 시간에는 기상 알람 외의 알림을 보내지 않아요.</p>
+      <div class="steps">
+        <div class="step"><div class="k">시작</div><div class="ctl"><span class="sb" data-d="-30" aria-label="30분 앞으로">−</span><b>23:00</b><span class="sb" data-d="30" aria-label="30분 뒤로">+</span></div></div>
+        <div class="step"><div class="k">종료</div><div class="ctl"><span class="sb" data-d="-30" aria-label="30분 앞으로">−</span><b>07:00</b><span class="sb" data-d="30" aria-label="30분 뒤로">+</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="c-title">시간 여유</div>
+      <div class="steps">
+        <div class="step"><div class="k">기상 → 출발 준비</div><div class="ctl"><span class="sb" data-d="-5" aria-label="5분 줄이기">−</span><b>40분</b><span class="sb" data-d="5" aria-label="5분 늘리기">+</span></div></div>
+        <div class="step"><div class="k">도착 여유</div><div class="ctl"><span class="sb" data-d="-5" aria-label="5분 줄이기">−</span><b>10분</b><span class="sb" data-d="5" aria-label="5분 늘리기">+</span></div></div>
+      </div>
+      <p class="note">알림 세부정보에서 “너무 일러요 / 너무 늦어요”를 누르면 이 값이 자동으로 보정돼요. (피드백 1건)</p>
+      <div class="applied">피드백 반영 후 실제 적용값: 준비 50분 · 여유 10분</div>
+      <div class="btn-row" style="margin-top:10px;">
+        <button type="button" class="btn btn-fill" data-toast="설정을 적용하고 알림을 다시 예약했어요">변경사항 적용</button>
+        <button type="button" class="btn btn-soft" data-go="ai">AI 제안 받기</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- ───── AI 제안 (시간 여유) ───── -->
+<template id="v-ai">
+  <div class="view">
+    <div class="sub-h"><div class="back" data-back aria-label="뒤로"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></div><div class="sub-t">AI 제안</div></div>
+    <p class="c-desc">최근 2주 동안 남긴 피드백과 알림 기록을 보고 시간 여유를 제안해요. 적용하기 전에는 바뀌지 않아요.</p>
+
+    <div class="ai-card">
+      <div class="label">기상 → 출발 준비</div>
+      <div class="ai-chg"><span class="from">40분</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="to">50분</span></div>
+      <p class="small" style="color:#4B5563;">기상 알람에 “너무 늦어요”를 2번 남겼어요. 아침 준비에 10분 정도 더 필요해 보여요.</p>
+      <div class="btn-row" style="margin-top:9px;">
+        <button type="button" class="btn btn-fill" data-toast="준비 시간을 50분으로 바꿨어요">적용</button>
+        <button type="button" class="btn btn-ghost" data-toast="이 제안은 넘길게요">나중에</button>
+      </div>
+    </div>
+
+    <div class="ai-card">
+      <div class="label">도착 여유</div>
+      <div class="ai-chg"><span class="from">10분</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="to">15분</span></div>
+      <p class="small" style="color:#4B5563;">월요일 출발 알림에 “너무 늦어요”를 1번 남겼어요. 환승이 있는 날은 5분 더 여유를 두면 좋아요.</p>
+      <div class="btn-row" style="margin-top:9px;">
+        <button type="button" class="btn btn-fill" data-toast="도착 여유를 15분으로 바꿨어요">적용</button>
+        <button type="button" class="btn btn-ghost" data-toast="이 제안은 넘길게요">나중에</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- 상단 알림 내려보기 -->
+<template id="v-shade">
+  <div class="shade" role="dialog" aria-label="상단 알림">
+    <div class="shade-bar"><span>08:24</span><span>9월 30일 (수)</span></div>
+    <div class="push">
+      <div class="push-h"><span class="push-ic"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></span>길메이트 · 이동 중</div>
+      <b>학교 · 08:50 도착 예정</b>
+      <p>지금: 5528 · 서울대입구역에서 2호선 환승</p>
+      <div class="pl">2호선 교대 방면 5분 후 도착</div>
+    </div>
+    <div class="push">
+      <div class="push-h"><span class="push-ic"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></span>길메이트 · 08:23</div>
+      <b>곧 서울대입구역 환승</b>
+      <p>내려서 2호선 탑승 → 교대역</p>
+    </div>
+    <div class="shade-hint">아무 곳이나 누르면 닫혀요</div>
+  </div>
+</template>
+
+<template id="tabs-tpl">
+  <div class="tabs">
+    <div class="tab" data-tab="schedule">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+      <div class="tl">일정</div>
+    </div>
+    <div class="tab" data-tab="alerts">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M10.3 21a2 2 0 0 0 3.4 0"/></svg>
+      <div class="tl">알림</div>
+    </div>
+    <div class="tab" data-tab="settings">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h12M19 8h2M3 16h4M11 16h10"/><circle cx="17" cy="8" r="2.2"/><circle cx="9" cy="16" r="2.2"/></svg>
+      <div class="tl">알림 설정</div>
+    </div>
+  </div>
+</template>
+
+<script>
+(function(){
+  var CLICKABLE='[data-go],[data-back],[data-tab],[data-toast],[data-shade],.tg,.seg,.sb';
+
+  function fill(root,d){
+    root.querySelectorAll('[data-use]').forEach(function(el){
+      el.replaceWith(document.getElementById(el.dataset.use).content.cloneNode(true));
+    });
+    root.querySelectorAll('[data-if]').forEach(function(el){
+      var p=el.dataset.if.split('='), v=d[p[0]];
+      var ok=p.length>1 ? v===p[1] : !!v;
+      if(!ok) el.remove();
+    });
+    root.querySelectorAll('[data-slot]').forEach(function(el){
+      var v=d[el.dataset.slot];
+      if(v!=null) el.textContent=v;
+    });
+    root.querySelectorAll('[data-addclass]').forEach(function(el){
+      var v=d[el.dataset.addclass];
+      if(v) el.classList.add(v);
+    });
+  }
+
+  function render(phone){
+    var top=phone._stack[phone._stack.length-1];
+    var tpl=document.getElementById('v-'+top.id);
+    var frag=tpl.content.cloneNode(true);
+    fill(frag,top.data||{});
+    phone.innerHTML='';
+    phone.appendChild(frag);
+    var tab=tpl.dataset.tab;
+    if(tab){
+      phone.appendChild(document.getElementById('tabs-tpl').content.cloneNode(true));
+      var on=phone.querySelector('.tab[data-tab="'+tab+'"]');
+      if(on){on.classList.add('on');on.setAttribute('aria-current','page');}
+    }
+    var t=document.createElement('div');
+    t.className='toast';t.setAttribute('role','status');
+    phone.appendChild(t);
+    phone.querySelectorAll(CLICKABLE).forEach(function(el){
+      if(el.tagName!=='BUTTON'){el.setAttribute('role','button');el.tabIndex=0;}
+    });
+  }
+
+  function toast(phone,msg){
+    var t=phone.querySelector('.toast');
+    if(!t) return;
+    t.textContent=msg;
+    t.classList.add('show');
+    clearTimeout(phone._th);
+    phone._th=setTimeout(function(){t.classList.remove('show');},1800);
+  }
+
+  function copyData(el){
+    var d={};
+    for(var k in el.dataset){ if(k!=='go') d[k]=el.dataset[k]; }
+    return d;
+  }
+
+  function goTab(phone,id){ phone._stack=[{id:id}]; render(phone); }
+  function back(phone){
+    if(phone._stack.length>1){ phone._stack.pop(); render(phone); }
+  }
+
+  function step(el){
+    var b=el.parentNode.querySelector('b'), d=+el.dataset.d, s=b.textContent;
+    if(s.indexOf(':')>-1){
+      var p=s.split(':'), m=(+p[0]*60 + +p[1] + d + 1440)%1440;
+      b.textContent=('0'+Math.floor(m/60)).slice(-2)+':'+('0'+m%60).slice(-2);
+    }else{
+      var n=Math.max(0,Math.min(120,parseInt(s,10)+d));
+      b.textContent=n+'분';
+    }
+  }
+
+  function handle(e){
+    var phone=e.target.closest('.phone');
+    if(!phone) return;
+
+    var shade=e.target.closest('.shade');
+    if(shade){ shade.remove(); return; }
+
+    var el=e.target.closest(CLICKABLE);
+    if(!el || !phone.contains(el)) return;
+
+    if(el.classList.contains('tg')){
+      el.classList.toggle('on');
+      el.setAttribute('aria-pressed',el.classList.contains('on'));
+      return;
+    }
+    if(el.classList.contains('seg')){
+      el.parentNode.querySelectorAll('.seg').forEach(function(s){s.classList.remove('on');});
+      el.classList.add('on');
+      if(el.dataset.snd) toast(phone,'소리: '+el.dataset.snd);
+      return;
+    }
+    if(el.classList.contains('sb')){ step(el); return; }
+    if(el.hasAttribute('data-shade')){
+      phone.appendChild(document.getElementById('v-shade').content.cloneNode(true));
+      return;
+    }
+
+    var msg=el.dataset.toast;
+    if(el.dataset.go){
+      phone._stack.push({id:el.dataset.go,data:copyData(el)});
+      render(phone);
+    }else if(el.dataset.tab){
+      goTab(phone,el.dataset.tab);
+    }else if(el.hasAttribute('data-back')){
+      back(phone);
+    }else if(el.dataset.after){
+      var a=el.dataset.after;
+      if(a==='back') back(phone);
+      else if(a.indexOf('tab:')===0) goTab(phone,a.slice(4));
+    }
+    if(msg) toast(phone,msg);
+  }
+
+  document.addEventListener('click',handle);
+  document.addEventListener('keydown',function(e){
+    if((e.key==='Enter'||e.key===' ') && e.target.matches && e.target.matches(CLICKABLE) && e.target.tagName!=='BUTTON'){
+      e.preventDefault(); e.target.click();
+    }
+  });
+
+  document.querySelectorAll('.phone').forEach(function(p){
+    p._stack=[{id:p.dataset.start}];
+    render(p);
+  });
+})();
+</script>
+</body>
+</html>
