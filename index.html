@@ -130,13 +130,10 @@
   .fld input.fv{width:100%;box-sizing:border-box;font-family:inherit;min-height:38px;appearance:none;-webkit-appearance:none;}
   .fld input.fv::placeholder{color:#9CA3AF;font-weight:500;}
   .fld input.fv:focus{outline:none;border-color:#2563EB;background:#fff;}
-  /* 일정 화면의 「내가 등록한 일정」 */
-  .mine-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
-  .mine-h b{font-size:13px;}
-  .mine-row{padding:7px 0;border-top:1px solid #EEF0F3;}
-  .mine-row b{display:block;font-size:12.5px;}
-  .mine-row span{display:block;font-size:11.5px;color:#6B7280;word-break:break-all;}
-  .mine .btn{width:100%;margin-top:8px;}
+  /* 시간표에 들어간 내 일정 */
+  .ev.own{box-shadow:0 0 0 1.5px #0b5a4a inset;}
+  .ev.own.half{left:50%;}
+  .wknav .arw{cursor:pointer;user-select:none;padding:8px 0;}
   .pl-row{display:flex;gap:6px;margin-top:8px;}
   .pl-row input.fv{flex:1;min-width:0;box-sizing:border-box;font-family:inherit;min-height:38px;border:1px solid #D5DAE2;border-radius:9px;padding:0 10px;background:#fff;}
   .pl-item{display:block;width:100%;text-align:left;border:1px solid #D5DAE2;border-radius:9px;background:#fff;padding:8px 10px;margin-top:6px;font-family:inherit;cursor:pointer;}
@@ -210,7 +207,7 @@
     background:var(--primary);color:var(--canvas);width:24px;height:24px;line-height:24px;
     border-radius:8px;margin:1px auto 0;
   }
-  .gbody{display:flex;position:relative;height:624px;margin-top:4px;}
+  .gbody{display:flex;position:relative;height:528px;margin-top:4px;}
   .gtime{width:20px;flex-shrink:0;position:relative;}
   .gtime i{
     position:absolute;left:0;font-style:normal;font-size:14px;line-height:14px;color:var(--ink-meta);
@@ -762,8 +759,7 @@
       </div>
     </div>
 
-    <!-- 내가 직접 등록한 일정 (브라우저 저장). 내용은 스크립트 renderMine 이 채운다 -->
-    <div class="card mine" data-mine></div>
+    <button type="button" class="btn btn-fill btn-big" style="margin-bottom:10px;" data-go="new">일정 등록</button>
 
     <div class="sug">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#475e75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6h5.4c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z"/></svg>
@@ -775,9 +771,9 @@
     </div>
 
     <div class="wknav">
-      <div class="arw" data-toast="지난주 일정이에요">‹</div>
+      <div class="arw" data-week="-1" aria-label="앞 주">‹</div>
       <div class="mid"><b>9월 28일 – 10월 4일</b><span>이번 주</span></div>
-      <div class="arw" data-toast="다음 주 일정은 2주 안까지 만들어져 있어요">›</div>
+      <div class="arw" data-week="1" aria-label="다음 주">›</div>
     </div>
 
     <div class="grid">
@@ -793,39 +789,41 @@
       </div>
       <div class="gbody">
         <div class="gtime">
-          <i style="top:0px;">8</i><i style="top:52px;">9</i><i style="top:104px;">10</i>
-          <i style="top:156px;">11</i><i style="top:208px;">12</i><i style="top:260px;">13</i>
-          <i style="top:312px;">14</i><i style="top:364px;">15</i><i style="top:416px;">16</i>
-          <i style="top:468px;">17</i><i style="top:520px;">18</i><i style="top:572px;">19</i>
-          <i style="top:624px;">20</i>
+          <i style="top:0px;">8</i><i style="top:44px;">9</i><i style="top:88px;">10</i>
+          <i style="top:132px;">11</i><i style="top:176px;">12</i><i style="top:220px;">13</i>
+          <i style="top:264px;">14</i><i style="top:308px;">15</i><i style="top:352px;">16</i>
+          <i style="top:396px;">17</i><i style="top:440px;">18</i><i style="top:484px;">19</i>
+          <i style="top:528px;">20</i>
         </div>
         <div class="gcol">
-          <div class="ev mv" style="top:15px;height:37px;">이동</div>
-          <div class="ev cl" style="top:52px;height:65px;" data-go="event" data-title="자료구조" data-src="시간표" data-d1="9월 30일 (수)" data-d2="10월 5일 (월)" data-a2="대체공휴일(개천절)" data-d3="10월 7일 (수)" data-d4="10월 12일 (월)" data-when="월·수 09:00–10:15" data-rep="매주" data-place="학교 · 공학관 301" data-tripline="집 08:07 출발 → 08:50 도착 · 43분" data-trip="school">자료구조<div class="tm">09:00</div></div>
-          <div class="ev cl" style="top:156px;height:65px;" data-go="event" data-title="선형대수" data-src="시간표" data-d1="10월 5일 (월)" data-a1="대체공휴일(개천절)" data-d2="10월 12일 (월)" data-when="월 11:00–12:15" data-rep="매주" data-place="학교 · 이과관 204" data-tripline="앞 수업과 같은 학교 · 이동 없음">선형대수<div class="tm">11:00</div></div>
-          <div class="ev mv" style="top:325px;height:39px;">이동</div>
-          <div class="ev us" style="top:364px;height:208px;" data-go="event" data-title="알바" data-src="직접 입력" data-when="월 15:00–19:00" data-rep="이번 주만 (반복 제안 있음)" data-place="기타 · 봉천동 카페" data-tripline="학교 14:15 출발 → 14:50 도착 · 35분">알바<div class="tm">15:00</div></div>
-          <div class="ev mv" style="top:572px;height:39px;">이동</div>
+          <div class="ev mv" style="top:13px;height:31px;">이동</div>
+          <div class="ev cl" style="top:44px;height:55px;" data-go="event" data-title="자료구조" data-src="시간표" data-d1="9월 30일 (수)" data-d2="10월 5일 (월)" data-a2="대체공휴일(개천절)" data-d3="10월 7일 (수)" data-d4="10월 12일 (월)" data-when="월·수 09:00–10:15" data-rep="매주" data-place="학교 · 공학관 301" data-tripline="집 08:07 출발 → 08:50 도착 · 43분" data-trip="school">자료구조<div class="tm">09:00</div></div>
+          <div class="ev cl" style="top:132px;height:55px;" data-go="event" data-title="선형대수" data-src="시간표" data-d1="10월 5일 (월)" data-a1="대체공휴일(개천절)" data-d2="10월 12일 (월)" data-when="월 11:00–12:15" data-rep="매주" data-place="학교 · 이과관 204" data-tripline="앞 수업과 같은 학교 · 이동 없음">선형대수<div class="tm">11:00</div></div>
+          <div data-once class="ev mv" style="top:275px;height:33px;">이동</div>
+          <div data-once class="ev us" style="top:308px;height:176px;" data-go="event" data-title="알바" data-src="직접 입력" data-when="월 15:00–19:00" data-rep="이번 주만 (반복 제안 있음)" data-place="기타 · 봉천동 카페" data-tripline="학교 14:15 출발 → 14:50 도착 · 35분">알바<div class="tm">15:00</div></div>
+          <div data-once class="ev mv" style="top:484px;height:33px;">이동</div>
+          <div data-other class="ev mv" style="top:187px;height:32px;">이동</div>
         </div>
         <div class="gcol">
-          <div class="ev mv" style="top:221px;height:39px;">이동</div>
-          <div class="ev cl" style="top:260px;height:65px;" data-go="event" data-title="운영체제" data-src="시간표" data-d1="10월 1일 (목)" data-d2="10월 6일 (화)" data-d3="10월 8일 (목)" data-d4="10월 13일 (화)" data-when="화·목 13:00–14:15" data-rep="매주" data-place="학교 · 공학관 105" data-tripline="집 12:07 출발 → 12:50 도착 · 43분" data-trip="school">운영체제<div class="tm">13:00</div></div>
-          <div class="ev mv" style="top:325px;height:39px;">이동</div>
+          <div class="ev mv" style="top:187px;height:33px;">이동</div>
+          <div class="ev cl" style="top:220px;height:55px;" data-go="event" data-title="운영체제" data-src="시간표" data-d1="10월 1일 (목)" data-d2="10월 6일 (화)" data-d3="10월 8일 (목)" data-d4="10월 13일 (화)" data-when="화·목 13:00–14:15" data-rep="매주" data-place="학교 · 공학관 105" data-tripline="집 12:07 출발 → 12:50 도착 · 43분" data-trip="school">운영체제<div class="tm">13:00</div></div>
+          <div class="ev mv" style="top:275px;height:33px;">이동</div>
         </div>
         <div class="gcol today">
-          <div class="ev mv" style="top:15px;height:37px;">이동</div>
-          <div class="ev cl" style="top:52px;height:65px;" data-go="event" data-title="자료구조" data-src="시간표" data-d1="9월 30일 (수)" data-d2="10월 5일 (월)" data-a2="대체공휴일(개천절)" data-d3="10월 7일 (수)" data-d4="10월 12일 (월)" data-when="월·수 09:00–10:15" data-rep="매주" data-place="학교 · 공학관 301" data-tripline="집 08:07 출발 → 08:50 도착 · 43분" data-trip="school">자료구조<div class="tm">09:00</div></div>
-          <div class="ev ca" style="top:520px;height:78px;" data-go="event" data-title="동아리 회의" data-src="캘린더" data-when="9월 30일(수) 18:00–19:30" data-rep="한 번" data-place="학교 · 학생회관" data-tripline="학교에 머무름 · 끝나고 19:30 귀가 (43분)">동아리 회의<div class="tm">18:00</div></div>
-          <div class="ev mv" style="top:598px;height:26px;">이동</div>
+          <div class="ev mv" style="top:13px;height:31px;">이동</div>
+          <div class="ev cl" style="top:44px;height:55px;" data-go="event" data-title="자료구조" data-src="시간표" data-d1="9월 30일 (수)" data-d2="10월 5일 (월)" data-a2="대체공휴일(개천절)" data-d3="10월 7일 (수)" data-d4="10월 12일 (월)" data-when="월·수 09:00–10:15" data-rep="매주" data-place="학교 · 공학관 301" data-tripline="집 08:07 출발 → 08:50 도착 · 43분" data-trip="school">자료구조<div class="tm">09:00</div></div>
+          <div data-once class="ev ca" style="top:440px;height:66px;" data-go="event" data-title="동아리 회의" data-src="캘린더" data-when="9월 30일(수) 18:00–19:30" data-rep="한 번" data-place="학교 · 학생회관" data-tripline="학교에 머무름 · 끝나고 19:30 귀가 (43분)">동아리 회의<div class="tm">18:00</div></div>
+          <div data-once class="ev mv" style="top:506px;height:22px;">이동</div>
+          <div data-other class="ev mv" style="top:99px;height:32px;">이동</div>
         </div>
         <div class="gcol">
-          <div class="ev mv" style="top:221px;height:39px;">이동</div>
-          <div class="ev cl" style="top:260px;height:65px;" data-go="event" data-title="운영체제" data-src="시간표" data-d1="10월 1일 (목)" data-d2="10월 6일 (화)" data-d3="10월 8일 (목)" data-d4="10월 13일 (화)" data-when="화·목 13:00–14:15" data-rep="매주" data-place="학교 · 공학관 105" data-tripline="집 12:07 출발 → 12:50 도착 · 43분" data-trip="school">운영체제<div class="tm">13:00</div></div>
-          <div class="ev mv" style="top:325px;height:39px;">이동</div>
+          <div class="ev mv" style="top:187px;height:33px;">이동</div>
+          <div class="ev cl" style="top:220px;height:55px;" data-go="event" data-title="운영체제" data-src="시간표" data-d1="10월 1일 (목)" data-d2="10월 6일 (화)" data-d3="10월 8일 (목)" data-d4="10월 13일 (화)" data-when="화·목 13:00–14:15" data-rep="매주" data-place="학교 · 공학관 105" data-tripline="집 12:07 출발 → 12:50 도착 · 43분" data-trip="school">운영체제<div class="tm">13:00</div></div>
+          <div class="ev mv" style="top:275px;height:33px;">이동</div>
         </div>
         <div class="gcol">
-          <div class="ev mv" style="top:472px;height:39px;">이동</div>
-          <div class="ev us" style="top:520px;height:78px;" data-go="event" data-title="저녁 약속" data-src="메시지 공유" data-when="10월 2일(금) 18:00–19:30" data-rep="한 번" data-place="기타 · 신촌역 근처" data-tripline="집 17:05 출발 → 17:50 도착 · 45분">저녁 약속<div class="tm">18:00</div></div>
+          <div data-once class="ev mv" style="top:399px;height:33px;">이동</div>
+          <div data-once class="ev us" style="top:440px;height:66px;" data-go="event" data-title="저녁 약속" data-src="메시지 공유" data-when="10월 2일(금) 18:00–19:30" data-rep="한 번" data-place="기타 · 신촌역 근처" data-tripline="집 17:05 출발 → 17:50 도착 · 45분">저녁 약속<div class="tm">18:00</div></div>
         </div>
         <div class="gcol"></div>
         <div class="gcol"></div>
@@ -936,7 +934,7 @@
       <div data-place-list role="status"></div>
       <label class="fld" style="margin:9px 0 0;"><div class="fk">메모</div><input class="fv" name="memo" type="text" maxlength="100" placeholder="예: 중앙도서관 3층" autocomplete="off"></label>
     </div>
-    <p class="small" style="margin:2px 2px 10px;">쓰는 내용은 이 브라우저에만 저장돼서 새로 고쳐도 남아요. 저장하면 일정 화면 「내가 등록한 일정」에 들어가요.</p>
+    <p class="small" style="margin:2px 2px 10px;">쓰는 내용은 이 브라우저에만 저장돼서 새로 고쳐도 남아요. 저장하면 일정 화면의 시간표에 들어가요.</p>
     <button type="button" class="btn btn-fill btn-big" data-save-event>저장</button>
   </div>
 </template>
@@ -1440,7 +1438,7 @@
 
 <script>
 (function(){
-  var CLICKABLE='[data-go],[data-back],[data-tab],[data-toast],[data-shade],[data-ring],[data-modal],[data-close],[data-skip],[data-fix],[data-home],[data-ai],[data-save-event],[data-place-search],[data-place-pick],[data-day],.tg,.seg,.sb';
+  var CLICKABLE='[data-go],[data-back],[data-tab],[data-toast],[data-shade],[data-ring],[data-modal],[data-close],[data-skip],[data-fix],[data-home],[data-ai],[data-save-event],[data-place-search],[data-place-pick],[data-day],[data-week],.tg,.seg,.sb';
 
   // ── 브라우저 저장: 내가 등록한 일정(gilmate.schedule)과 쓰던 내용(gilmate.draft)만 이 브라우저에 둔다.
   //    서버·로그인 없음. 저장이 막힌 브라우저(시크릿 창 등)에서는 창이 열려 있는 동안만 기억한다 ──
@@ -1624,7 +1622,8 @@
       if(!rows.length){ var p=document.createElement('p'); p.className='small'; p.textContent='일정이 없어 알림도 없어요.'; v.appendChild(p); }
       rows.forEach(function(x){ x.classList.remove('dim','now'); v.appendChild(x); });
     }
-    return {add:add,full:full,today:today,mon:mon,PLAN:PLAN,fillAlerts:fillAlerts,
+    return {add:add,full:full,md:md,ymd:ymd,today:today,mon:mon,
+      inTerm:function(d){ return d>=new Date(2026,8,1)&&d<=TERM_END; },PLAN:PLAN,fillAlerts:fillAlerts,
       real:function(){ var d=new Date(); return {dow:today.getDay(),date:today,t:d.getHours()*60+d.getMinutes()+d.getSeconds()/60}; },
       stale:function(){ return add(new Date(),0).getTime()!==today.getTime(); }};
   })();
@@ -1706,34 +1705,52 @@
     store.set(KEY_EVENTS,list);
     store.remove(KEY_DRAFT);
     goTab(phone,'schedule');
-    document.querySelectorAll('.phone').forEach(renderMine);
-    toast(phone,'일정을 저장했어요');
+    // 넣은 주를 열어 바로 보이게 한다
+    var sp=d.date.split('-'), sd=new Date(+sp[0],+sp[1]-1,+sp[2]), at=list[list.length-1].at;
+    phone._week=Math.floor(Math.round((sd-cal.mon)/864e5)/7);
+    document.querySelectorAll('.phone').forEach(function(p){ if(p._stack[p._stack.length-1].id==='schedule') render(p); });
+    var own=phone.querySelector('.ev.own[data-at="'+at+'"]'), vw=phone.querySelector('.view');
+    if(own) vw.scrollTop+=own.getBoundingClientRect().top-vw.getBoundingClientRect().top-vw.clientHeight/2;
+    toast(phone,dayText(d.date,d.repeat)+' '+d.start+' 시간표에 넣었어요');
     warnIfNoStore(phone);
   }
-  // 일정 화면 맨 위 「내가 등록한 일정」. 고객이 쓴 글은 textContent 로만 넣는다
-  function renderMine(phone){
-    var box=phone.querySelector('[data-mine]');
-    if(!box) return;
-    var list=loadEvents().sort(function(a,b){ return (a.date+a.start).localeCompare(b.date+b.start); });
-    box.textContent='';
-    var h=document.createElement('div'); h.className='mine-h';
-    var hb=document.createElement('b'); hb.textContent='내가 등록한 일정';
-    var hs=document.createElement('span'); hs.className='small'; hs.textContent=list.length?list.length+'개 · '+(store.ok()?'이 브라우저에 저장됨':'새로 고치면 사라져요'):'';
-    h.appendChild(hb); h.appendChild(hs); box.appendChild(h);
-    if(!list.length){
-      var p=document.createElement('p'); p.className='small';
-      p.textContent='약속·알바처럼 시간표에 없는 일정을 직접 적어 보세요.'+(store.ok()?' 새로 고쳐도 남아 있어요.':'');
-      box.appendChild(p);
-    }
-    list.forEach(function(x){
-      var row=document.createElement('div'); row.className='mine-row';
-      var t=document.createElement('b'); t.textContent=dayText(x.date,x.repeat)+' '+x.start+'–'+x.end;
-      var s=document.createElement('span'); s.textContent=[x.title,x.place,x.memo].filter(Boolean).join(' · ');
-      row.appendChild(t); row.appendChild(s); box.appendChild(row);
+  // 일정 화면 시간표: 고른 주(phone._week)의 날짜와 저장한 일정을 그린다. 고객이 쓴 글은 textContent 로만 넣는다
+  var HOUR=44, DAY0=8*60, DAY1=20*60;              // 한 시간 높이(px) · 시간표 8시–20시
+  function toM(t){ var p=t.split(':'); return +p[0]*60 + +p[1]; }
+  function renderWeek(phone){
+    var body=phone.querySelector('.gbody'); if(!body) return;
+    var w=phone._week||0, mon=cal.add(cal.mon,w*7), sun=cal.add(mon,6), list=loadEvents();
+    phone.querySelector('.wknav b').textContent=cal.md(mon)+' – '+cal.md(sun);
+    phone.querySelector('.wknav span').textContent=w===0?'이번 주':w===1?'다음 주':w===-1?'지난주':w>0?w+'주 뒤':(-w)+'주 전';
+    phone.querySelectorAll('.ghead .dc').forEach(function(dc,i){
+      var d=cal.add(mon,i);
+      dc.dataset.ymd=cal.ymd(d); dc.querySelector('.dd').textContent=d.getDate();
+      dc.classList.toggle('today',d.getTime()===cal.today.getTime());
     });
-    // 일정이 있든 없든 긴 시간표보다 위에서 바로 누를 수 있게 한다
-    var b=document.createElement('button'); b.type='button'; b.className='btn btn-fill'; b.dataset.go='new'; b.textContent='일정 등록';
-    box.appendChild(b);
+    body.querySelectorAll('.gcol').forEach(function(col,i){
+      var d=cal.add(mon,i), key=cal.ymd(d);
+      col.classList.toggle('today',d.getTime()===cal.today.getTime());
+      col.querySelectorAll(w===0?'[data-other]':'[data-once]').forEach(function(x){ x.remove(); });
+      if(w!==0&&!cal.inTerm(d)) col.querySelectorAll('.ev.cl,.ev.mv').forEach(function(x){ x.remove(); });  // 학기 밖에는 수업이 없다
+      list.forEach(function(x){
+        var p=x.date.split('-'), sd=new Date(+p[0],+p[1]-1,+p[2]);
+        if(isNaN(sd.getTime())) return;
+        if(x.repeat==='매주' ? (sd.getDay()!==d.getDay()||d<sd) : cal.ymd(sd)!==key) return;
+        // 시간표 밖(8시 전·20시 뒤)은 가장자리에 붙여 보이게 한다
+        var st=Math.max(DAY0,Math.min(DAY1-30,toM(x.start))), en=Math.max(st+30,Math.min(DAY1,toM(x.end)));
+        var top=(st-DAY0)*HOUR/60, h=(en-st)*HOUR/60, hit=false;
+        col.querySelectorAll('.ev:not(.mv)').forEach(function(o){
+          var t=parseFloat(o.style.top), oh=parseFloat(o.style.height);
+          if(t<top+h&&top<t+oh) hit=true;
+        });
+        var e=document.createElement('div'); e.className='ev us own'+(hit?' half':'');
+        e.style.top=top+'px'; e.style.height=h+'px'; e.dataset.at=x.at;
+        e.dataset.toast=[x.title,x.start+'–'+x.end,x.place,x.memo].filter(Boolean).join(' · ');
+        e.appendChild(document.createTextNode(x.title));
+        var tm=document.createElement('div'); tm.className='tm'; tm.textContent=x.start; e.appendChild(tm);
+        col.appendChild(e);
+      });
+    });
   }
 
   // ── 실제 정보 붙이기: 서버 함수(/api)가 공휴일·지하철 도착을 대신 받아 온다.
@@ -1836,7 +1853,7 @@
     var t=document.createElement('div');
     t.className='toast';t.setAttribute('role','status');
     phone.appendChild(t);
-    renderMine(phone);
+    renderWeek(phone);
     restoreDraft(phone);
     phone.querySelectorAll(CLICKABLE).forEach(function(el){
       if(el.tagName!=='BUTTON'){el.setAttribute('role','button');el.tabIndex=0;}
@@ -1862,7 +1879,7 @@
     return d;
   }
 
-  function goTab(phone,id){ phone._day=0; phone._stack=[{id:id}]; render(phone); }
+  function goTab(phone,id){ phone._day=0; phone._week=0; phone._stack=[{id:id}]; render(phone); }
   function back(phone){
     if(phone._stack.length>1){ phone._stack.pop(); render(phone); }
   }
@@ -1906,6 +1923,13 @@
       return;
     }
     if(el.hasAttribute('data-save-event')){ saveEvent(phone); return; }
+    if(el.hasAttribute('data-week')){
+      var wd=el.getAttribute('data-week'), sc=phone.querySelector('.view').scrollTop;
+      phone._week=(phone._week||0)+ +wd; render(phone);
+      phone.querySelector('.view').scrollTop=sc;
+      phone.querySelector('[data-week="'+wd+'"]').focus({preventScroll:true});
+      return;
+    }
     if(el.hasAttribute('data-day')){
       phone._day=+el.getAttribute('data-day'); render(phone);
       var dc=phone.querySelector('[data-day="'+phone._day+'"]'); if(dc) dc.focus({preventScroll:true});
