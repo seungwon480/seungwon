@@ -287,6 +287,12 @@
   }
 
   /* ── 3. 알림 ── */
+  .days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:13px;}
+  .dayc{min-width:0;min-height:52px;padding:6px 0;border:1px solid #D5DAE2;border-radius:10px;background:#fff;color:#1F2937;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;}
+  .dayc span{font-size:11px;color:#4B5563;} .dayc b{font-size:15px;font-weight:700;}
+  .dayc.none{background:transparent;} .dayc.none b{font-weight:400;color:#6B7280;}
+  .dayc.on{background:var(--primary);border-color:var(--primary);} .dayc.on span,.dayc.on b{color:#fff;}
+  .dayc:focus-visible{outline:2px solid var(--primary);outline-offset:2px;}
   .live{background:#2563EB;border-radius:15px;padding:14px;color:#fff;margin-bottom:14px;}
   .live .lab{font-size:10.5px;font-weight:700;color:#C5D8FD;}
   .live .ttl{font-size:16px;font-weight:800;margin-top:3px;}
@@ -1434,7 +1440,7 @@
 
 <script>
 (function(){
-  var CLICKABLE='[data-go],[data-back],[data-tab],[data-toast],[data-shade],[data-ring],[data-modal],[data-close],[data-skip],[data-fix],[data-home],[data-ai],[data-save-event],[data-place-search],[data-place-pick],.tg,.seg,.sb';
+  var CLICKABLE='[data-go],[data-back],[data-tab],[data-toast],[data-shade],[data-ring],[data-modal],[data-close],[data-skip],[data-fix],[data-home],[data-ai],[data-save-event],[data-place-search],[data-place-pick],[data-day],.tg,.seg,.sb';
 
   // ── 브라우저 저장: 내가 등록한 일정(gilmate.schedule)과 쓰던 내용(gilmate.draft)만 이 브라우저에 둔다.
   //    서버·로그인 없음. 저장이 막힌 브라우저(시크릿 창 등)에서는 창이 열려 있는 동안만 기억한다 ──
@@ -1557,6 +1563,11 @@
         deps:[{at:487,time:'08:07',dest:'학교 · 자료구조 09:00',sub:'07:27 기상 · 이동 43분'},{at:855,time:'14:15',dest:'봉천동 카페 · 알바 15:00',sub:'이동 35분'},{at:1140,time:'19:00',dest:'집 · 오늘 일정 끝 · 귀가',sub:'알바 끝나고 · 이동 45분'}]},
       2:{rows:os(),trip:osTrip,deps:osDeps},
       3:{rows:null,
+        // 아직 오지 않은 수요일: 길 막힘과 실시간 도착은 미리 알 수 없으니 평소 시각으로
+        laterRows:trip('07:27','08:07','08:13','08:23','08:50','자료구조 09:00','ds','동아리 회의 18:00').concat([
+          row('17:45','다음 일정','nxt','다음 일정: 동아리 회의','18:00 · 학생회관',{ev:'club'}),
+          row('19:30','출발','go','오늘 일정 끝 · 귀가','집까지 43분',{route:'home',ev:'club'})]),
+        laterDeps:[{at:487,time:'08:07',dest:'학교 · 자료구조 09:00',sub:'07:27 기상 · 이동 43분'}],
         trip:{dep:477,arr:530,tr:'08:23',at:'08:50',ttl:'학교 · 자료구조 09:00',met:'출발 07:57 · 도착 예정 08:50 · 53분 (길 막힘 +10분)'},
         deps:[{at:477,time:'07:57',dest:'학교 · 자료구조 09:00',sub:'07:17 기상 · 이동 53분 (길 막힘 +10분)'},{at:1170,time:'19:30',dest:'집 · 오늘 일정 끝 · 귀가',sub:'동아리 회의 끝나고 · 이동 43분'}]},
       4:{rows:os().concat([row('22:55','출발','go','막차 주의','스터디 끝나고 23:10 출발 → 막차까지 여유 20분 · 늦어도 23:30 출발 (2호선 교대역 막차 23:42)',{route:'home',n2:'스터디 끝나고 23:10 출발 → 막차까지 여유 20분'})]),trip:osTrip,deps:osDeps},
@@ -1574,7 +1585,8 @@
       el.appendChild(mk('nt',r.time)); el.appendChild(mk('bdg '+r.kc,r.kind)); el.appendChild(gr);
       return el;
     }
-    function rowEls(dow){
+    function rowEls(dow,later){
+      if(later&&PLAN[dow].laterRows) return PLAN[dow].laterRows.map(rowEl);
       if(PLAN[dow].rows) return PLAN[dow].rows.map(rowEl);
       var n=0, out=[];                             // 수요일: 템플릿의 첫 묶음
       document.getElementById('v-alerts').content.querySelectorAll('.dsec,.nrow').forEach(function(el){
@@ -1583,27 +1595,34 @@
       });
       return out;
     }
-    // 알림 목록을 실제 오늘·내일로 다시 그린다
-    function fillAlerts(phone){
-      var v=phone.querySelector('.view');
+    // 알림 화면: 위에서 고른 하루(오늘부터 7일 안)의 알림만 그린다. 하루 빨리 보기 중에는 시연하는 날만
+    function fillAlerts(phone,simOn){
+      var v=phone.querySelector('.view'), k=simOn?0:(phone._day||0);
+      if(simOn){
+        var n=0;                                   // 템플릿의 첫 묶음(수요일)만 남긴다
+        [].slice.call(v.children).forEach(function(x){ if(x.classList.contains('dsec')) n++; if(n>1) x.remove(); });
+        v.querySelector('.dsec b').textContent='시연하는 날';
+        return;
+      }
       v.querySelectorAll('.dsec,.nrow,.more').forEach(function(x){ x.remove(); });
-      function sec(label,d,mt){
-        var e=document.createElement('div'); e.className='dsec'; if(mt) e.style.marginTop='14px';
-        var b=document.createElement('b'); b.textContent=label; var sp=document.createElement('span'); sp.textContent=full(d);
-        e.appendChild(b); e.appendChild(sp); v.appendChild(e);
+      var bar=document.createElement('div'); bar.className='days'; bar.setAttribute('role','group'); bar.setAttribute('aria-label','알림 볼 날짜');
+      for(var i=0;i<7;i++){
+        var d=add(today,i), cnt=rowEls(d.getDay(),i>0).length, c=document.createElement('button');
+        c.type='button'; c.className='dayc'+(i===k?' on':'')+(cnt?'':' none'); c.setAttribute('data-day',i);
+        c.setAttribute('aria-pressed',i===k);
+        c.setAttribute('aria-label',(i===0?'오늘 ':i===1?'내일 ':'')+full(d)+' 알림 '+(cnt?cnt+'개':'없음'));
+        var l=document.createElement('span'); l.textContent=i===0?'오늘':i===1?'내일':DOW[d.getDay()];
+        var m=document.createElement('b'); m.textContent=d.getDate();
+        c.appendChild(l); c.appendChild(m); bar.appendChild(c);
       }
-      function none(t){ var p=document.createElement('p'); p.className='small'; p.textContent=t; v.appendChild(p); }
-      var a=rowEls(today.getDay()), tm=add(today,1), b=rowEls(tm.getDay());
-      sec('오늘',today); if(a.length) a.forEach(function(x){ v.appendChild(x); }); else none('오늘은 일정이 없어 알림도 없어요.');
-      sec('내일',tm,true);
-      if(!b.length){ none('내일은 일정이 없어 알림도 없어요.'); return; }
-      var main=b.filter(function(x){ return x.dataset.kc==='wake'||x.dataset.kc==='go'; }).slice(0,3);
-      main.forEach(function(x){ x.classList.remove('dim','now'); v.appendChild(x); });
-      var left=b.length-main.length;
-      if(left>0){
-        var m=document.createElement('div'); m.className='more'; m.dataset.toast='내일 알림이 '+left+'개 더 있어요'; m.textContent='내일 알림 '+left+'개 더';
-        v.appendChild(m);
-      }
+      v.insertBefore(bar,v.querySelector('.h-title').nextSibling);
+      var day=add(today,k), rows=rowEls(day.getDay(),k>0);
+      var e=document.createElement('div'); e.className='dsec';
+      var bb=document.createElement('b'); bb.textContent=k===0?'오늘':k===1?'내일':DOW[day.getDay()]+'요일';
+      var sp=document.createElement('span'); sp.textContent=full(day);
+      e.appendChild(bb); e.appendChild(sp); v.appendChild(e);
+      if(!rows.length){ var p=document.createElement('p'); p.className='small'; p.textContent='일정이 없어 알림도 없어요.'; v.appendChild(p); }
+      rows.forEach(function(x){ x.classList.remove('dim','now'); v.appendChild(x); });
     }
     return {add:add,full:full,today:today,mon:mon,PLAN:PLAN,fillAlerts:fillAlerts,
       real:function(){ var d=new Date(); return {dow:today.getDay(),date:today,t:d.getHours()*60+d.getMinutes()+d.getSeconds()/60}; },
@@ -1803,7 +1822,7 @@
     fill(frag,top.data||{});
     phone.innerHTML='';
     phone.appendChild(frag);
-    if(top.id==='alerts' && !(sim&&sim.isActive())) cal.fillAlerts(phone);
+    if(top.id==='alerts') cal.fillAlerts(phone,!!(sim&&sim.isActive()));
     var tab=tpl.dataset.tab;
     if(tab){
       phone.appendChild(document.getElementById('tabs-tpl').content.cloneNode(true));
@@ -1843,7 +1862,7 @@
     return d;
   }
 
-  function goTab(phone,id){ phone._stack=[{id:id}]; render(phone); }
+  function goTab(phone,id){ phone._day=0; phone._stack=[{id:id}]; render(phone); }
   function back(phone){
     if(phone._stack.length>1){ phone._stack.pop(); render(phone); }
   }
@@ -1887,6 +1906,11 @@
       return;
     }
     if(el.hasAttribute('data-save-event')){ saveEvent(phone); return; }
+    if(el.hasAttribute('data-day')){
+      phone._day=+el.getAttribute('data-day'); render(phone);
+      var dc=phone.querySelector('[data-day="'+phone._day+'"]'); if(dc) dc.focus({preventScroll:true});
+      return;
+    }
     if(el.hasAttribute('data-place-search')){ searchPlace(phone); return; }
     if(el.hasAttribute('data-place-pick')){ pickPlace(phone,el); return; }
     if(el.classList.contains('sb')){ step(el); return; }
@@ -2089,13 +2113,10 @@
         if(n===1) rows.push(el);
       });
       var cur=null;
-      if(active){
-        var ds=phone.querySelectorAll('.dsec b');
-        if(ds.length>1){ ds[0].textContent='시연하는 날'; ds[1].textContent='다음 날'; }
-      }
       rows.forEach(function(r){
         var m=toMin(r.dataset.time);
         r.classList.remove('now','dim');
+        if(!active&&phone._day) return;            // 오늘이 아닌 날은 지난 알림이 없다
         if(m<=c.t){ r.classList.add('dim'); cur=r; }
       });
       if(cur){ cur.classList.remove('dim'); cur.classList.add('now'); }
@@ -2111,7 +2132,7 @@
       if(w){
         var nx=null, k;
         for(k=0;k<8&&!nx;k++){
-          var day=cal.add(c.date,k), list=cal.PLAN[day.getDay()].deps;
+          var day=cal.add(c.date,k), pl=cal.PLAN[day.getDay()], list=k>0&&pl.laterDeps||pl.deps;
           for(var j=0;j<list.length&&!nx;j++){
             if(k>0||list[j].at>c.t) nx={d:list[j],left:(k*1440+list[j].at-c.t)*60,
               pre:k===0?'':k===1?'내일 ':(day.getMonth()+1)+'/'+day.getDate()+'('+DOW[day.getDay()]+') '};
