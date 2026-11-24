@@ -3,8 +3,13 @@
 const POSTER_PNG = require('./_poster.js');
 
 const MESSAGE = '이번 주 금요일 저녁 6시에 신촌역 2번 출구 앞에서 보자! 저녁 먹고 영화 보러 가자';
-// 소개 페이지 시연 화면의 "오늘" (일정 화면의 9월 30일 수요일)
-const TODAY = '2026년 9월 30일 수요일';
+// 한국 시각의 실제 오늘 (서버 시계는 세계 표준시라 9시간을 더한다)
+const kst = () => new Date(Date.now() + 9 * 3600 * 1000);
+const todayText = () => {
+  const d = kst();
+  return `${d.getUTCFullYear()}년 ${d.getUTCMonth() + 1}월 ${d.getUTCDate()}일 ${'일월화수목금토'[d.getUTCDay()]}요일`;
+};
+const secondsToMidnight = () => 86400 - Math.floor((kst().getTime() / 1000) % 86400);
 const MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
 const FORMAT =
   '키: title(짧은 제목), date("10월 2일 (금)" 꼴), time("18:00" 또는 "18:00–19:30" 꼴), place(장소). 모르는 값은 빈 문자열.';
@@ -12,11 +17,11 @@ const FORMAT =
 function partsFor(source) {
   if (source === 'poster') {
     return [
-      { text: `오늘은 ${TODAY}이다. 이 행사 포스터 사진에서 행사 일정을 하나 뽑아 JSON 으로만 답해라. 사전 신청 기간은 행사 날짜가 아니니 넣지 마라.\n${FORMAT}` },
+      { text: `오늘은 ${todayText()}이다. 이 행사 포스터 사진에서 행사 일정을 하나 뽑아 JSON 으로만 답해라. 사전 신청 기간은 행사 날짜가 아니니 넣지 마라.\n${FORMAT}` },
       { inline_data: { mime_type: 'image/png', data: POSTER_PNG } },
     ];
   }
-  return [{ text: `오늘은 ${TODAY}이다. 아래 메시지에서 약속 일정을 하나 뽑아 JSON 으로만 답해라.\n${FORMAT}\n메시지: ${MESSAGE}` }];
+  return [{ text: `오늘은 ${todayText()}이다. 아래 메시지에서 약속 일정을 하나 뽑아 JSON 으로만 답해라.\n${FORMAT}\n메시지: ${MESSAGE}` }];
 }
 
 module.exports = async (req, res) => {
@@ -38,8 +43,8 @@ module.exports = async (req, res) => {
     const text = (data?.candidates?.[0]?.content?.parts ?? []).map((p) => p.text || '').join('');
     const v = JSON.parse(text);
     const pick = (k) => (typeof v[k] === 'string' ? v[k].trim().slice(0, 40) : '');
-    // 같은 예시라 결과가 같다 → 한 시간 동안 저장해 두고 다시 묻지 않는다 (무료 한도 보호)
-    res.setHeader('cache-control', 's-maxage=3600');
+    // 같은 날에는 결과가 같다 → 한 시간(자정을 넘지 않게) 저장해 두고 다시 묻지 않는다 (무료 한도 보호)
+    res.setHeader('cache-control', `s-maxage=${Math.min(3600, secondsToMidnight())}`);
     return res.status(200).json({ ok: true, title: pick('title'), date: pick('date'), time: pick('time'), place: pick('place') });
   } catch (e) {
     return res.status(200).json({ ok: false, reason: 'error' });
