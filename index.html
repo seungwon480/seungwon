@@ -459,7 +459,10 @@
   .widget .w-dest{font-size:13px;color:#E0E9FF;margin-top:6px;}
   .widget .w-wake{font-size:12px;color:#C5D8FD;}
   .widget .w-live{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.25);font-size:12.5px;font-weight:700;line-height:1.45;}
-  .widget .w-live[hidden]{display:none;}
+  .widget .w-live[hidden],.now-box[hidden]{display:none;}
+  .now-box{margin:10px 0 2px;background:rgba(255,255,255,.82);border:1.5px dashed #64748B;border-radius:14px;padding:9px 12px;color:#111827;}
+  .now-box b{display:block;font-size:13px;line-height:1.4;}
+  .now-box span{display:block;font-size:11.5px;color:#374151;margin-top:2px;}
   .widget-name{font-size:10.5px;color:#374151;text-align:center;margin-top:6px;font-weight:600;}
   .apps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 8px;margin-top:22px;}
   .app{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10.5px;color:#1F2937;font-weight:600;}
@@ -1423,6 +1426,7 @@
       <div class="w-live" hidden></div>
     </div>
     <div class="widget-name">길메이트 다음 출발 (4×2)</div>
+    <div class="now-box" hidden><b></b><span></span></div>
     <div class="apps"><div class="app"><i style="background:#F97316;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></i>캘린더</div><div class="app"><i style="background:#2563EB;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></i>길메이트</div><div class="app"><i style="background:#111827;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg></i>시계</div><div class="app"><i style="background:#EC4899;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M20 16l-5-5-8 8"/></svg></i>사진</div><div class="app"><i style="background:#10B981;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4l-5 2v14l5-2 6 2 5-2V4l-5 2z"/><path d="M9 4v14M15 6v14"/></svg></i>지도</div><div class="app"><i style="background:#F59E0B;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h12v16H6z"/><path d="M9 9h6M9 13h6"/></svg></i>메모</div><div class="app"><i style="background:#0EA5E9;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17h10a4 4 0 0 0 0-8 6 6 0 0 0-11 2 3 3 0 0 0 1 6z"/></svg></i>날씨</div><div class="app"><i style="background:#6B7280;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></i>설정</div></div>
     <p class="hs-hint">홈 화면을 길게 누르고 › 위젯 › 길메이트를 고르면 추가돼요.<br>남은 시간은 1초마다 줄고, 출발 시각이 지나면 다음 출발로 바뀌어요.<br>위젯을 누르면 앱의 알림 화면이 열려요.</p>
     <div class="dock"><div class="app"><i style="background:#22C55E;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-3 2a11 11 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></i>전화</div><div class="app"><i style="background:#3B82F6;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg></i>메시지</div><div class="app"><i style="background:#8B5CF6;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4a12 12 0 0 1 0 16M12 4a12 12 0 0 0 0 16"/></svg></i>인터넷</div><div class="app"><i style="background:#374151;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></i>카메라</div></div>
@@ -1667,33 +1671,30 @@
       return (b?[b]:[]).concat(own(d,later).trips);
     }
 
-    // 알림 화면: 위에서 고른 하루(오늘부터 7일 안)의 알림만 그린다. 하루 빨리 보기 중에는 시연하는 날만
+    // 알림 화면: 위에서 고른 하루의 알림만 그린다. 날짜 칸은 오늘부터 7일이고,
+    // 하루 빨리 보기 중인 날이 그 밖이면 맨 앞에 붙인다. 고르지 않았으면 빨리 보기 중인 날(없으면 오늘)
     function fillAlerts(phone,simDay){
-      var v=phone.querySelector('.view'), k=phone._day||0;
-      if(simDay){
-        v.querySelectorAll('.dsec,.nrow,.more').forEach(function(x){ x.remove(); });
-        var se=document.createElement('div'), sb=document.createElement('b'), ss=document.createElement('span');
-        se.className='dsec'; sb.textContent=simDay.date.getTime()===today.getTime()?'오늘':simDay.date.getTime()===add(today,1).getTime()?'내일':DOW[simDay.date.getDay()]+'요일'; ss.textContent=full(simDay.date);
-        se.appendChild(sb); se.appendChild(ss); v.appendChild(se);
-        dayEls(simDay.date,simDay.later).forEach(function(x){ x.classList.remove('dim','now'); v.appendChild(x); });
-        return;
-      }
+      var v=phone.querySelector('.view'), days=[], i, base=simDay?simDay.date:today;
       v.querySelectorAll('.dsec,.nrow,.more').forEach(function(x){ x.remove(); });
+      for(i=0;i<7;i++) days.push(add(today,i));
+      if(!days.some(function(d){ return d.getTime()===base.getTime(); })) days.unshift(base);
+      var sel=days.filter(function(d){ return d.getTime()===phone._day; })[0]||base;
+      function isLater(d){ return simDay&&d.getTime()===simDay.date.getTime()?simDay.later:d>today; }
+      function name(d){ return d.getTime()===today.getTime()?'오늘':d.getTime()===add(today,1).getTime()?'내일':DOW[d.getDay()]; }
+      phone._viewing=sel.getTime();
       var bar=document.createElement('div'); bar.className='days'; bar.setAttribute('role','group'); bar.setAttribute('aria-label','알림 볼 날짜');
-      for(var i=0;i<7;i++){
-        var d=add(today,i), cnt=dayEls(d,i>0).length, c=document.createElement('button');
-        c.type='button'; c.className='dayc'+(i===k?' on':'')+(cnt?'':' none'); c.setAttribute('data-day',i);
-        c.setAttribute('aria-pressed',i===k);
-        c.setAttribute('aria-label',(i===0?'오늘 ':i===1?'내일 ':'')+full(d)+' 알림 '+(cnt?cnt+'개':'없음'));
-        var l=document.createElement('span'); l.textContent=i===0?'오늘':i===1?'내일':DOW[d.getDay()];
-        var m=document.createElement('b'); m.textContent=d.getDate();
+      bar.style.gridTemplateColumns='repeat('+days.length+',1fr)';
+      days.forEach(function(d){
+        var cnt=dayEls(d,isLater(d)).length, on=d.getTime()===sel.getTime(), c=document.createElement('button'), nm=name(d);
+        c.type='button'; c.className='dayc'+(on?' on':'')+(cnt?'':' none'); c.setAttribute('data-day',d.getTime());
+        c.setAttribute('aria-pressed',on);
+        c.setAttribute('aria-label',(nm.length>1?nm+' ':'')+full(d)+' 알림 '+(cnt?cnt+'개':'없음'));
+        var l=document.createElement('span'), m=document.createElement('b'); l.textContent=nm; m.textContent=d.getDate();
         c.appendChild(l); c.appendChild(m); bar.appendChild(c);
-      }
+      });
       v.insertBefore(bar,v.querySelector('.h-title').nextSibling);
-      var day=add(today,k), rows=dayEls(day,k>0);
-      var e=document.createElement('div'); e.className='dsec';
-      var bb=document.createElement('b'); bb.textContent=k===0?'오늘':k===1?'내일':DOW[day.getDay()]+'요일';
-      var sp=document.createElement('span'); sp.textContent=full(day);
+      var rows=dayEls(sel,isLater(sel)), e=document.createElement('div'), bb=document.createElement('b'), sp=document.createElement('span'), nm=name(sel);
+      e.className='dsec'; bb.textContent=nm.length>1?nm:nm+'요일'; sp.textContent=full(sel);
       e.appendChild(bb); e.appendChild(sp); v.appendChild(e);
       if(!rows.length){ var p=document.createElement('p'); p.className='small'; p.textContent='일정이 없어 알림도 없어요.'; v.appendChild(p); }
       rows.forEach(function(x){ x.classList.remove('dim','now'); v.appendChild(x); });
@@ -2284,7 +2285,8 @@
       var old=homePhone.querySelector('.hu'); if(old) old.remove();
       if(waitRing){ waitRing=null; goTab(homePhone,'home'); }
       $('sim-day').value=date.getTime();
-      if(active) document.querySelectorAll('.phone').forEach(function(p){ if(p._stack[p._stack.length-1].id==='alerts') render(p); });
+      // 날을 바꾸면 알림 화면도 그날로 돌아온다
+      if(active) document.querySelectorAll('.phone').forEach(function(p){ p._day=0; if(p._stack[p._stack.length-1].id==='alerts') render(p); });
       if(homePhone._stack) refresh(); else ui();
     }
     function all(){ return EVENTS.concat(extra).sort(function(a,b){ return a.min-b.min; }); }
@@ -2311,27 +2313,30 @@
       if(sec>=3600) return Math.floor(sec/3600)+'시간 '+Math.floor(sec%3600/60)+'분';
       return ('0'+Math.floor(sec/60)).slice(-2)+':'+('0'+sec%60).slice(-2);
     }
-    // 타러 가는 역의 실시간 도착. 시연 시계와 상관없이 "지금" 값이라 기준 시각을 함께 적는다.
-    // 20초에 한 번만 묻고, 키가 없거나 실패하면 숨긴다
-    var rt={key:'',at:0,text:'',off:0};
-    function showLive(el,r){
-      if(!el) return;
-      if(!r){ el.hidden=true; return; }
+    // 타러 가는 역의 실시간 도착. 20초에 한 번만 묻고, 키가 없거나 실패하면 숨긴다.
+    // 하루 빨리 보기 중에는 위젯의 시각과 다른 "지금 실제" 값이라 위젯 밖에 따로 보여 준다
+    var rt={key:'',at:0,list:null,hm:'',off:0};
+    function showLive(w,r){
+      var el=w.querySelector('.w-live'), box=w.parentNode.querySelector('.now-box');
+      if(!r){ el.hidden=box.hidden=true; return; }
       var key=r.from+'|'+r.line+'|'+r.nx, now=Date.now();
-      if(rt.key!==key){ rt.key=key; rt.at=0; rt.text=''; }
+      if(rt.key!==key){ rt.key=key; rt.at=0; rt.list=null; }
       if(now-rt.at>20000 && now>rt.off && !document.hidden){
         rt.at=now;
         fetch('/api/subway',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({station:r.from,line:r.line,next:r.nx})})
           .then(function(x){ return x.json(); }).catch(function(){ return null; })
           .then(function(d){
             if(rt.key!==key) return;
-            if(!d||!d.ok){ rt.text=''; rt.off=Date.now()+60000; return; }        // 안 되면 1분 쉰다
-            var n=new Date(), list=Array.isArray(d.arrivals)?d.arrivals.map(function(a){ return str(a,16); }):[];
-            rt.text='지금 '+r.from+' 실시간 · '+(list.length?list.join(', '):'오는 열차 없음')+' ('+('0'+n.getHours()).slice(-2)+':'+('0'+n.getMinutes()).slice(-2)+' 기준)';
+            if(!d||!d.ok||!Array.isArray(d.arrivals)){ rt.list=null; rt.off=Date.now()+60000; }        // 안 되면 1분 쉰다
+            else{ var n=new Date(); rt.list=d.arrivals.map(function(a){ return str(a,16); }); rt.hm=('0'+n.getHours()).slice(-2)+':'+('0'+n.getMinutes()).slice(-2); }
             document.querySelectorAll('.phone').forEach(decorate);   // 시계가 멈춰 있어도 바로 보이게
           });
       }
-      el.hidden=!rt.text; el.textContent=rt.text;
+      var txt=rt.list?(rt.list.length?rt.list.join(', '):'오는 열차 없음'):'';
+      el.hidden=!txt||active; box.hidden=!txt||!active;
+      el.textContent='실시간 '+r.from+' · '+txt+' ('+rt.hm+' 기준)';
+      box.querySelector('b').textContent='지금 실제 '+r.from+' '+r.line+' · '+txt;
+      box.querySelector('span').textContent='실제 시각 '+rt.hm+' 기준이에요. 위 위젯은 '+cal.full(date)+' 시각이에요.';
     }
     function decorate(phone){
       var c=active?{date:date,t:t,later:later()}:cal.real(), trs=cal.trips(c.date,!!c.later);
@@ -2354,7 +2359,7 @@
       rows.forEach(function(r){
         var m=toMin(r.dataset.time);
         r.classList.remove('now','dim');
-        if(!active&&phone._day) return;            // 오늘이 아닌 날은 지난 알림이 없다
+        if(phone._viewing!==c.date.getTime()) return;   // 시계가 가는 날만 지난 알림을 흐리게
         if(m<=c.t){ r.classList.add('dim'); cur=r; }
       });
       if(cur){ cur.classList.remove('dim'); cur.classList.add('now'); }
@@ -2384,10 +2389,10 @@
           w.querySelector('.w-dest').textContent=st.next;
           w.querySelector('.w-wake').textContent=(st.tt?'열차 시간표 기준':'예상 시각')+' · 도착 '+tr.at+' · '+tr.ttl;
           w.setAttribute('aria-label','길메이트 위젯: 이동 중, '+st.big);
-          showLive(w.querySelector('.w-live'),st.wait);
+          showLive(w,st.wait);
           return;
         }
-        showLive(w.querySelector('.w-live'),null);
+        showLive(w,null);
         lab.textContent='길메이트 · 다음 출발'; cdl.data='출발까지 ';
         for(k=0;k<8&&!nx;k++){
           var day=cal.add(c.date,k), list=cal.deps(day,k>0||!!c.later);
@@ -2471,7 +2476,7 @@
       if(active) return;
       active=true;
       // 실제 오늘 목록을 시연하는 날 목록으로 바꾼다
-      document.querySelectorAll('.phone').forEach(function(p){ if(p._stack[p._stack.length-1].id==='alerts') render(p); });
+      document.querySelectorAll('.phone').forEach(function(p){ p._day=0; if(p._stack[p._stack.length-1].id==='alerts') render(p); });
       refresh();
     }
 
