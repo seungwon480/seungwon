@@ -1765,7 +1765,8 @@
   }
   function pickPlace(phone,el){
     var form=phone.querySelector('[data-form="new"]'); if(!form) return;
-    form.querySelector('[name="placeq"]').value=el.getAttribute('data-place-pick');
+    // 지하철역은 이름 뒤의 호선을 뗀다 ("홍대입구역 2호선 09:50 도착"이 열차 시각으로 읽히지 않게)
+    form.querySelector('[name="placeq"]').value=el.getAttribute('data-place-pick').replace(/^(\S+역)\s+(?:\S*\d호선|경의중앙선|수인분당선|신분당선|공항철도|경춘선|경강선|서해선|신림선|우이신설선|의정부경전철|에버라인|김포골드라인|GTX-?[A-D])$/,'$1');
     form.querySelector('[name="px"]').value=el.dataset.x; form.querySelector('[name="py"]').value=el.dataset.y;
     form.querySelector('[data-place-list]').textContent='';
     clearSegs(form); saveDraft(phone);
