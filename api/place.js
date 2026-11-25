@@ -28,6 +28,8 @@ module.exports = async (req, res) => {
     const results = docs.slice(0, 5).map((d) => ({
       name: String(d.place_name || d.address_name || '').slice(0, 40),
       address: String(d.road_address_name || d.address_name || '').slice(0, 80),
+      x: Number(d.x) || 0,
+      y: Number(d.y) || 0,
     })).filter((x) => x.name);
     return res.status(200).json({ ok: true, results });
   } catch (e) {

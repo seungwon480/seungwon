@@ -132,7 +132,7 @@
   .fld input.fv:focus{outline:none;border-color:#2563EB;background:#fff;}
   /* 시간표에 들어간 내 일정 */
   .ev.own{box-shadow:0 0 0 1.5px #0b5a4a inset;}
-  .ev.own.half{left:50%;}
+  .ev.own.half,.ev.mvo.half{left:50%;}
   .wknav .arw{cursor:pointer;user-select:none;padding:8px 0;}
   .clash{font-size:13px;font-weight:600;line-height:1.45;color:#9B1C1C;background:#FDECEC;border-radius:9px;padding:9px 11px;margin:0 0 10px;word-break:break-all;}
   .pl-row{display:flex;gap:6px;margin-top:8px;}
@@ -451,13 +451,18 @@
   .live .ride-now{font-size:11px;color:#C5D8FD;margin-bottom:6px;}
   /* 홈 화면 + 위젯 */
   .view.home{background:linear-gradient(170deg,#C7D7F5 0%,#E9D9F0 55%,#F7E3D3 100%);padding:14px 16px 16px;display:flex;flex-direction:column;}
-  .hs-bar{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:#1F2937;padding:0 4px 14px;}
+  .hs-bar{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:#1F2937;padding:0 4px 84px;}  /* 아래 빈 곳은 알림 배너 자리 */
   .widget{background:linear-gradient(135deg,#1E3A8A,#2F6BFF);border-radius:22px;padding:16px;color:#fff;box-shadow:0 10px 24px rgba(30,58,138,.28);}
   .widget .w-lab{font-size:11.5px;font-weight:700;color:#C5D8FD;}
   .widget .w-dep{font-size:28px;font-weight:800;line-height:1.15;margin-top:2px;}
   .widget .w-cd{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;}
   .widget .w-dest{font-size:13px;color:#E0E9FF;margin-top:6px;}
   .widget .w-wake{font-size:12px;color:#C5D8FD;}
+  .widget .w-live{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.25);font-size:12.5px;font-weight:700;line-height:1.45;}
+  .widget .w-live[hidden],.now-box[hidden]{display:none;}
+  .now-box{margin:10px 0 2px;background:rgba(255,255,255,.82);border:1.5px dashed #64748B;border-radius:14px;padding:9px 12px;color:#111827;}
+  .now-box b{display:block;font-size:13px;line-height:1.4;}
+  .now-box span{display:block;font-size:11.5px;color:#374151;margin-top:2px;}
   .widget-name{font-size:10.5px;color:#374151;text-align:center;margin-top:6px;font-weight:600;}
   .apps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 8px;margin-top:22px;}
   .app{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10.5px;color:#1F2937;font-weight:600;}
@@ -554,7 +559,7 @@
   <section class="sim" aria-label="하루 빨리 보기">
     <div class="sim-top">
       <span class="sim-lab">하루 빨리 보기</span>
-      <select class="sim-day" id="sim-day" aria-label="시연할 날"></select>
+      <select class="sim-day" id="sim-day" aria-label="날짜"></select>
       <span class="sim-clock"><span id="sim-time">06:50</span></span>
       <div class="sim-btns">
         <button type="button" class="sim-b main" id="sim-play" aria-pressed="false">▶ 재생</button>
@@ -825,8 +830,6 @@
           <div class="ev mv" style="top:250px;height:30px;">이동</div>
         </div>
         <div class="gcol">
-          <div data-once class="ev mv" style="top:363px;height:30px;">이동</div>
-          <div data-once class="ev us" style="top:400px;height:60px;" data-go="event" data-title="저녁 약속" data-src="메시지 공유" data-when="10월 2일(금) 18:00–19:30" data-rep="한 번" data-place="기타 · 신촌역 근처" data-tripline="집 17:05 출발 → 17:50 도착 · 45분">저녁 약속<div class="tm">18:00</div></div>
         </div>
         <div class="gcol"></div>
         <div class="gcol"></div>
@@ -935,6 +938,7 @@
       </div>
       <div class="pl-row"><input class="fv" name="placeq" type="text" maxlength="40" placeholder="다른 곳은 장소 이름·주소로 검색" aria-label="장소 검색" autocomplete="off"><button type="button" class="btn btn-soft" data-place-search>검색</button></div>
       <div data-place-list role="status"></div>
+      <input type="hidden" name="px"><input type="hidden" name="py">
       <label class="fld" style="margin:9px 0 0;"><div class="fk">메모</div><input class="fv" name="memo" type="text" maxlength="100" placeholder="예: 중앙도서관 3층" autocomplete="off"></label>
     </div>
     <p class="small" style="margin:2px 2px 10px;">쓰는 내용은 이 브라우저에만 저장돼서 새로 고쳐도 남아요. 저장하면 일정 화면의 시간표에 들어가요.</p>
@@ -954,17 +958,19 @@
     <button type="button" class="btn btn-soft" style="width:100%;margin-top:10px;" data-ai>AI로 일정 읽기</button>
 
     <div class="sec-t">AI가 읽은 일정</div>
-    <div class="card" data-ai-result>
-      <div class="fld" data-toast="앱에서는 이 칸을 눌러 고칠 수 있어요 (미리보기에서는 입력할 수 없어요)"><div class="fk">제목</div><div class="fv">저녁 약속</div></div>
+    <div class="card" data-ai-result data-form="imp" data-kind="message">
+      <label class="fld"><div class="fk">제목</div><input class="fv" name="title" type="text" maxlength="30" placeholder="AI가 읽으면 채워져요" autocomplete="off"></label>
+      <label class="fld"><div class="fk">날짜</div><input class="fv" name="date" type="date"></label>
       <div class="fld2">
-        <div class="fld" data-toast="앱에서는 이 칸을 눌러 고칠 수 있어요 (미리보기에서는 입력할 수 없어요)"><div class="fk">날짜</div><div class="fv">10월 2일 (금)</div></div>
-        <div class="fld" data-toast="앱에서는 이 칸을 눌러 고칠 수 있어요 (미리보기에서는 입력할 수 없어요)"><div class="fk">시간</div><div class="fv">18:00–19:30</div></div>
+        <label class="fld"><div class="fk">시작</div><input class="fv" name="start" type="time"></label>
+        <label class="fld"><div class="fk">종료</div><input class="fv" name="end" type="time"></label>
       </div>
-      <div class="fld" style="margin-bottom:0;" data-toast="앱에서는 이 칸을 눌러 고칠 수 있어요 (미리보기에서는 입력할 수 없어요)"><div class="fk">장소</div><div class="fv">신촌역 2번 출구</div></div>
+      <label class="fld" style="margin-bottom:0;"><div class="fk">장소</div><input class="fv" name="place" type="text" maxlength="40" autocomplete="off"></label>
     </div>
-    <p class="small" style="margin:2px 2px 10px;">저장을 누르기 전에는 일정에 들어가지 않아요. 틀린 곳은 눌러서 고칠 수 있어요.</p>
+    <p class="small" style="margin:2px 2px 10px;">저장을 누르기 전에는 일정에 들어가지 않아요. 틀린 곳은 눌러서 고칠 수 있어요. 메시지에 없는 시각은 비워 둬요.</p>
+    <p class="clash" data-clash role="alert" hidden></p>
     <div class="btn-row">
-      <button type="button" class="btn btn-fill" data-toast="“저녁 약속”을 일정에 저장했어요" data-after="tab:schedule">일정으로 저장</button>
+      <button type="button" class="btn btn-fill" data-save-imp>일정으로 저장</button>
       <button type="button" class="btn btn-ghost" data-back>취소</button>
     </div>
   </div>
@@ -1365,18 +1371,20 @@
     <button type="button" class="btn btn-soft" style="width:100%;margin-top:10px;" data-ai="poster">AI로 일정 읽기</button>
 
     <div class="sec-t">AI가 읽은 일정</div>
-    <div class="card" data-ai-result>
-      <div class="fld" data-toast="앱에서는 이 칸을 눌러 고칠 수 있어요 (미리보기에서는 입력할 수 없어요)"><div class="fk">제목</div><div class="fv">가을 진로·취업 박람회</div></div>
+    <div class="card" data-ai-result data-form="imp" data-kind="poster">
+      <label class="fld"><div class="fk">제목</div><input class="fv" name="title" type="text" maxlength="30" placeholder="AI가 읽으면 채워져요" autocomplete="off"></label>
+      <label class="fld"><div class="fk">날짜</div><input class="fv" name="date" type="date"></label>
       <div class="fld2">
-        <div class="fld" data-toast="앱에서는 이 칸을 눌러 고칠 수 있어요 (미리보기에서는 입력할 수 없어요)"><div class="fk">날짜</div><div class="fv">10월 15일 (목)</div></div>
-        <div class="fld" data-toast="앱에서는 이 칸을 눌러 고칠 수 있어요 (미리보기에서는 입력할 수 없어요)"><div class="fk">시간</div><div class="fv">13:00–17:00</div></div>
+        <label class="fld"><div class="fk">시작</div><input class="fv" name="start" type="time"></label>
+        <label class="fld"><div class="fk">종료</div><input class="fv" name="end" type="time"></label>
       </div>
-      <div class="fld" data-toast="앱에서는 이 칸을 눌러 고칠 수 있어요 (미리보기에서는 입력할 수 없어요)"><div class="fk">장소</div><div class="fv">학생회관 대강당</div></div>
-      <div class="warnline">사전 신청 기간(10.1–10.10)은 행사 날짜가 아니라서 일정에 넣지 않았어요.</div>
+      <label class="fld" style="margin-bottom:0;"><div class="fk">장소</div><input class="fv" name="place" type="text" maxlength="40" autocomplete="off"></label>
+      <div class="warnline" style="margin-top:8px;">사전 신청 기간(10.1–10.10)은 행사 날짜가 아니라서 일정에 넣지 않았어요.</div>
     </div>
-    <p class="small" style="margin:2px 2px 10px;">저장을 누르기 전에는 일정에 들어가지 않아요. 틀린 곳은 눌러서 고칠 수 있어요.</p>
+    <p class="small" style="margin:2px 2px 10px;">저장을 누르기 전에는 일정에 들어가지 않아요. 틀린 곳은 눌러서 고칠 수 있어요. 메시지에 없는 시각은 비워 둬요.</p>
+    <p class="clash" data-clash role="alert" hidden></p>
     <div class="btn-row">
-      <button type="button" class="btn btn-fill" data-toast="“가을 진로·취업 박람회”를 일정에 저장했어요" data-after="tab:schedule">일정으로 저장</button>
+      <button type="button" class="btn btn-fill" data-save-imp>일정으로 저장</button>
       <button type="button" class="btn btn-ghost" data-back>취소</button>
     </div>
   </div>
@@ -1415,8 +1423,10 @@
       <div class="w-cd">출발까지 <span data-countdown="2820">47:00</span></div>
       <div class="w-dest">학교 · 자료구조 09:00</div>
       <div class="w-wake">07:17 기상 · 이동 53분 (길 막힘 +10분)</div>
+      <div class="w-live" hidden></div>
     </div>
     <div class="widget-name">길메이트 다음 출발 (4×2)</div>
+    <div class="now-box" hidden><b></b><span></span></div>
     <div class="apps"><div class="app"><i style="background:#F97316;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></i>캘린더</div><div class="app"><i style="background:#2563EB;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></i>길메이트</div><div class="app"><i style="background:#111827;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg></i>시계</div><div class="app"><i style="background:#EC4899;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M20 16l-5-5-8 8"/></svg></i>사진</div><div class="app"><i style="background:#10B981;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4l-5 2v14l5-2 6 2 5-2V4l-5 2z"/><path d="M9 4v14M15 6v14"/></svg></i>지도</div><div class="app"><i style="background:#F59E0B;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h12v16H6z"/><path d="M9 9h6M9 13h6"/></svg></i>메모</div><div class="app"><i style="background:#0EA5E9;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17h10a4 4 0 0 0 0-8 6 6 0 0 0-11 2 3 3 0 0 0 1 6z"/></svg></i>날씨</div><div class="app"><i style="background:#6B7280;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></i>설정</div></div>
     <p class="hs-hint">홈 화면을 길게 누르고 › 위젯 › 길메이트를 고르면 추가돼요.<br>남은 시간은 1초마다 줄고, 출발 시각이 지나면 다음 출발로 바뀌어요.<br>위젯을 누르면 앱의 알림 화면이 열려요.</p>
     <div class="dock"><div class="app"><i style="background:#22C55E;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-3 2a11 11 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></i>전화</div><div class="app"><i style="background:#3B82F6;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg></i>메시지</div><div class="app"><i style="background:#8B5CF6;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4a12 12 0 0 1 0 16M12 4a12 12 0 0 0 0 16"/></svg></i>인터넷</div><div class="app"><i style="background:#374151;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></i>카메라</div></div>
@@ -1442,7 +1452,7 @@
 
 <script>
 (function(){
-  var CLICKABLE='[data-go],[data-back],[data-tab],[data-toast],[data-shade],[data-ring],[data-modal],[data-close],[data-skip],[data-fix],[data-home],[data-ai],[data-save-event],[data-place-search],[data-place-pick],[data-day],[data-week],.tg,.seg,.sb';
+  var CLICKABLE='[data-go],[data-back],[data-tab],[data-toast],[data-shade],[data-ring],[data-modal],[data-close],[data-skip],[data-fix],[data-home],[data-ai],[data-save-event],[data-save-imp],[data-place-search],[data-place-pick],[data-day],[data-week],.tg,.seg,.sb';
 
   // ── 브라우저 저장: 내가 등록한 일정(gilmate.schedule)과 쓰던 내용(gilmate.draft)만 이 브라우저에 둔다.
   //    서버·로그인 없음. 저장이 막힌 브라우저(시크릿 창 등)에서는 창이 열려 있는 동안만 기억한다 ──
@@ -1493,7 +1503,7 @@
     if(!Array.isArray(list)) return [];
     return list.filter(function(x){ return x&&typeof x.title==='string'&&typeof x.date==='string'; }).map(function(x){
       return {title:str(x.title,30),date:str(x.date,10),start:str(x.start,5),end:str(x.end,5),
-        repeat:str(x.repeat,4)||'한 번',place:str(x.place,40),memo:str(x.memo,100),at:+x.at||0};
+        repeat:str(x.repeat,4)||'한 번',place:str(x.place,40),memo:str(x.memo,100),at:+x.at||0,route:cleanRoute(x.route)};
     });
   }
   var DOW=['일','월','화','수','목','금','토'];
@@ -1543,6 +1553,8 @@
     function row(time,kind,kc,title,body,o){
       var r={time:time,kind:kind,kc:kc,title:title,body:body}; for(var k in o||{}) r[k]=o[k]; return r;
     }
+    // 예시 학교 길: 신림사거리 5528 → 서울대입구역 2호선 (길이 막히면 버스만 10분 더)
+    function schoolRides(jam){ return [{line:'5528',from:'신림사거리',to:'서울대입구역',at:6,dur:12+jam},{line:'2호선',from:'서울대입구역',to:'교대역',nx:'낙성대역',at:21+jam,dur:10}]; }
     function trip(wake,dep,stn,tr,arr,cls,ev,next){
       var o={route:'school',ev:ev};
       return [row(wake,'기상','wake','기상 알람',dep+' 출발 · '+cls+' (학교)',o),
@@ -1552,7 +1564,7 @@
         row(arr,'도착','arr','학교 도착 예정','지금: '+cls+(next?' · 다음: '+next:''),{ev:ev})];
     }
     function os(){ return trip('11:27','12:07','12:13','12:23','12:50','운영체제 13:00','os').concat([row('14:15','출발','go','오늘 일정 끝 · 귀가','집까지 43분',{route:'home',ev:'os'})]); }
-    var osTrip={dep:727,arr:770,tr:'12:23',at:'12:50',ttl:'학교 · 운영체제 13:00',met:'출발 12:07 · 도착 예정 12:50 · 43분'};
+    var osTrip={rides:schoolRides(0),dep:727,arr:770,tr:'12:23',at:'12:50',ttl:'학교 · 운영체제 13:00',met:'출발 12:07 · 도착 예정 12:50 · 43분'};
     var osDeps=[{at:727,time:'12:07',dest:'학교 · 운영체제 13:00',sub:'11:27 기상 · 이동 43분'},{at:855,time:'14:15',dest:'집 · 오늘 일정 끝 · 귀가',sub:'운영체제 끝나고 · 이동 43분'}];
     var PLAN={
       1:{rows:trip('07:27','08:07','08:13','08:23','08:50','자료구조 09:00','ds','선형대수 11:00').concat([
@@ -1560,7 +1572,7 @@
           row('14:15','출발','go','알바로 출발할 시간','알바 15:00 · 이동 35분'),
           row('14:50','도착','arr','봉천동 카페 도착 예정','지금: 알바 15:00'),
           row('19:00','출발','go','오늘 일정 끝 · 귀가','집까지 45분')]),
-        trip:{dep:487,arr:530,tr:'08:23',at:'08:50',ttl:'학교 · 자료구조 09:00',met:'출발 08:07 · 도착 예정 08:50 · 43분'},
+        trip:{rides:schoolRides(0),dep:487,arr:530,tr:'08:23',at:'08:50',ttl:'학교 · 자료구조 09:00',met:'출발 08:07 · 도착 예정 08:50 · 43분'},
         deps:[{at:487,time:'08:07',dest:'학교 · 자료구조 09:00',sub:'07:27 기상 · 이동 43분'},{at:855,time:'14:15',dest:'봉천동 카페 · 알바 15:00',sub:'이동 35분'},{at:1140,time:'19:00',dest:'집 · 오늘 일정 끝 · 귀가',sub:'알바 끝나고 · 이동 45분'}]},
       2:{rows:os(),trip:osTrip,deps:osDeps},
       3:{rows:null,
@@ -1569,12 +1581,11 @@
           row('17:45','다음 일정','nxt','다음 일정: 동아리 회의','18:00 · 학생회관',{ev:'club'}),
           row('19:30','출발','go','오늘 일정 끝 · 귀가','집까지 43분',{route:'home',ev:'club'})]),
         laterDeps:[{at:487,time:'08:07',dest:'학교 · 자료구조 09:00',sub:'07:27 기상 · 이동 43분'},{at:1170,time:'19:30',dest:'집 · 오늘 일정 끝 · 귀가',sub:'동아리 회의 끝나고 · 이동 43분'}],
-        laterTrip:{dep:487,arr:530,tr:'08:23',at:'08:50',ttl:'학교 · 자료구조 09:00',met:'출발 08:07 · 도착 예정 08:50 · 43분'},
-        trip:{dep:477,arr:530,tr:'08:23',at:'08:50',ttl:'학교 · 자료구조 09:00',met:'출발 07:57 · 도착 예정 08:50 · 53분 (길 막힘 +10분)'},
+        laterTrip:{rides:schoolRides(0),dep:487,arr:530,tr:'08:23',at:'08:50',ttl:'학교 · 자료구조 09:00',met:'출발 08:07 · 도착 예정 08:50 · 43분'},
+        trip:{rides:schoolRides(10),dep:477,arr:530,tr:'08:23',at:'08:50',ttl:'학교 · 자료구조 09:00',met:'출발 07:57 · 도착 예정 08:50 · 53분 (길 막힘 +10분)'},
         deps:[{at:477,time:'07:57',dest:'학교 · 자료구조 09:00',sub:'07:17 기상 · 이동 53분 (길 막힘 +10분)'},{at:1170,time:'19:30',dest:'집 · 오늘 일정 끝 · 귀가',sub:'동아리 회의 끝나고 · 이동 43분'}]},
       4:{rows:os().concat([row('22:55','출발','go','막차 주의','스터디 끝나고 23:10 출발 → 막차까지 여유 20분 · 늦어도 23:30 출발 (2호선 교대역 막차 23:42)',{route:'home',n2:'스터디 끝나고 23:10 출발 → 막차까지 여유 20분'})]),trip:osTrip,deps:osDeps},
-      5:{rows:[row('17:05','출발','go','저녁 약속으로 출발할 시간','저녁 약속 18:00 · 이동 45분'),row('17:50','도착','arr','신촌역 도착 예정','지금: 저녁 약속 18:00'),row('19:30','출발','go','오늘 일정 끝 · 귀가','집까지 45분')],trip:null,
-        deps:[{at:1025,time:'17:05',dest:'신촌역 · 저녁 약속 18:00',sub:'이동 45분'},{at:1170,time:'19:30',dest:'집 · 오늘 일정 끝 · 귀가',sub:'저녁 약속 끝나고 · 이동 45분'}]},
+      5:{rows:[],trip:null,deps:[]},
       6:{rows:[],trip:null,deps:[]},
       0:{rows:[],trip:null,deps:[]}
     };
@@ -1599,6 +1610,18 @@
     }
     // 직접 등록한 일정에서 그날 알림을 만든다 (브라우저에 저장된 일정만, 이동 시간은 예시 값)
     var GO_SCHOOL=43, GO_OTHER=45, SPARE=10, PREP=40, NEXT=15;
+    // 조사: 받침이 없거나 ㄹ 받침이면 "로", 나머지는 "으로"
+    function ro(w){ var c=w.charCodeAt(w.length-1)-0xAC00, j=c>=0&&c<11172?c%28:0; return w+(j===0||j===8?'로':'으로'); }
+    // 이동 중 지금 할 일: 탈 차를 기다림 → 타는 중 → 환승 → 걷기
+    function stage(tr,t){
+      var rs=tr.rides||[], end={big:rs.length?'걸어서 도착하는 중':'이동 중',lab:'도착까지',left:tr.arr-t,next:tr.ttl};
+      for(var i=0;i<rs.length;i++){
+        var r=rs[i], on=tr.dep+r.at, off=on+r.dur;
+        if(t<on) return {big:r.line+' '+hm(on)+(r.tt?'':'쯤'),lab:i?r.from+'에서 갈아타는 중 · 타기까지':r.from+'까지 걷는 중 · 타기까지',left:on-t,next:r.from+'에서 타고 '+r.to+'까지',tt:r.tt,wait:r.nx?r:null};
+        if(t<off) return {ride:true,big:r.line+' 타는 중',lab:r.to+'까지',left:off-t,next:rs[i+1]?r.to+'에서 '+rs[i+1].line+' 환승':r.to+'에서 내려요',tt:r.tt};
+      }
+      return end;
+    }
     function hm(m){ return ('0'+Math.floor(m/60)).slice(-2)+':'+('0'+m%60).slice(-2); }
     function ownEvents(d){
       return loadEvents().filter(function(x){
@@ -1611,7 +1634,7 @@
       var out={rows:[],deps:[],trips:[]}, pl=PLAN[d.getDay()], base=baseTrip(pl,later);
       var firstBase=Math.min.apply(null,rowEls(d.getDay(),later).map(function(x){ return toM(x.dataset.time); }).concat([9999])), woke=false;
       ownEvents(d).forEach(function(x){
-        var st=toM(x.start), at=x.place||'', school=at==='학교', go=school?GO_SCHOOL:GO_OTHER, dep=st-go-SPARE;
+        var st=toM(x.start), at=x.place||'', school=at==='학교', rt=school?{min:GO_SCHOOL,rides:schoolRides(0)}:x.route, go=rt?rt.min:GO_OTHER, dep=st-go-SPARE;
         // 집에서 하는 일, 이미 학교에 있는 시간, 자정을 넘기는 출발은 시작 전 알림만
         if(!at||at==='집'||(school&&base&&base.arr<=st)||dep<0){
           out.rows.push(row(hm(Math.max(0,st-NEXT)),'다음 일정','nxt','다음 일정: '+x.title,[x.start,at].filter(Boolean).join(' · ')));
@@ -1619,13 +1642,22 @@
         }
         // 그날 맨 처음 나가는 오전 일정이면 기상 알람도
         if(!woke&&dep<12*60&&dep-PREP>=0&&dep<firstBase){
-          out.rows.push(row(hm(dep-PREP),'기상','wake','기상 알람',hm(dep)+' 출발 · '+x.title+' '+x.start+' ('+at+')'));
+          out.rows.push(row(hm(dep-PREP),'기상','wake','기상 알람',hm(dep)+' 출발 · '+x.title+' '+x.start+' ('+at+') · 준비 '+PREP+'분 + 이동 '+(rt?'':'약 ')+go+'분 + 여유 '+SPARE+'분',{n2:hm(dep)+' 출발 · '+x.title+' '+x.start+' · 이동 '+(rt?'':'약 ')+go+'분'}));
         }
         woke=true;
-        out.rows.push(row(hm(dep),'출발','go',at+' · 출발할 시간',x.title+' '+x.start+' · 이동 약 '+go+'분'));
+        var rides=rt?rt.rides:[], first=rides[0];
+        // 경로를 알면 처음 탈 곳으로, 모르면 도착할 곳으로 알린다
+        out.rows.push(row(hm(dep),'출발','go',first?ro(first.from)+' 출발할 시간':at+' · 출발할 시간',(first?first.line+' '+hm(dep+first.at)+(first.tt?'':'쯤')+' 탑승 · ':'')+x.title+' '+x.start+(first?'':' · '+at+'까지 '+(rt?'':'약 ')+go+'분')));
+        rides.forEach(function(r,i){
+          // 처음 타는 곳은 도착을 알리지 않는다 (탈 것과 시각은 출발 알림에 있다)
+          if(i) out.rows.push(row(hm(dep+Math.max(0,rides[i-1].at+rides[i-1].dur-2)),'정류장·역','stn','곧 '+rides[i-1].to+' 환승','내려서 '+r.line+' '+hm(dep+r.at)+(r.tt?'':'쯤')+' 탑승 → '+r.to));
+        });
+        // 마지막 차에서 내리기 2분 전
+        var last=rides[rides.length-1];
+        if(last) out.rows.push(row(hm(dep+last.at+Math.max(0,last.dur-2)),'정류장·역','stn','곧 '+last.to+'에서 내려요',last.line+' '+hm(dep+last.at+last.dur)+(last.tt?'':'쯤')+' 도착 · 내릴 준비를 하세요'));
         out.rows.push(row(hm(dep+go),'도착','arr',at+' 도착 예정','지금: '+x.title+' '+x.start));
-        out.deps.push({at:dep,time:hm(dep),dest:at+' · '+x.title+' '+x.start,sub:'이동 약 '+go+'분'});
-        out.trips.push({dep:dep,arr:dep+go,own:true,ttl:at+' · '+x.title+' '+x.start,met:'출발 '+hm(dep)+' · 도착 예정 '+hm(dep+go)+' · 약 '+go+'분'});
+        out.deps.push({at:dep,time:hm(dep),dest:at+' · '+x.title+' '+x.start,sub:(first?first.from+' '+first.line+' · ':'')+'이동 '+(rt?'':'약 ')+go+'분'});
+        out.trips.push({id:x.at,to:at,st:st,dep:dep,arr:dep+go,own:true,rides:rides,at:hm(dep+go),ttl:at+' · '+x.title+' '+x.start,met:'출발 '+hm(dep)+' · 도착 예정 '+hm(dep+go)+' · 약 '+go+'분'});
       });
       return out;
     }
@@ -1642,39 +1674,36 @@
       return (b?[b]:[]).concat(own(d,later).trips);
     }
 
-    // 알림 화면: 위에서 고른 하루(오늘부터 7일 안)의 알림만 그린다. 하루 빨리 보기 중에는 시연하는 날만
+    // 알림 화면: 위에서 고른 하루의 알림만 그린다. 날짜 칸은 오늘부터 7일이고,
+    // 하루 빨리 보기 중인 날이 그 밖이면 맨 앞에 붙인다. 고르지 않았으면 빨리 보기 중인 날(없으면 오늘)
     function fillAlerts(phone,simDay){
-      var v=phone.querySelector('.view'), k=phone._day||0;
-      if(simDay){
-        v.querySelectorAll('.dsec,.nrow,.more').forEach(function(x){ x.remove(); });
-        var se=document.createElement('div'), sb=document.createElement('b'), ss=document.createElement('span');
-        se.className='dsec'; sb.textContent='시연하는 날'; ss.textContent=full(simDay.date);
-        se.appendChild(sb); se.appendChild(ss); v.appendChild(se);
-        dayEls(simDay.date,simDay.later).forEach(function(x){ x.classList.remove('dim','now'); v.appendChild(x); });
-        return;
-      }
+      var v=phone.querySelector('.view'), days=[], i, base=simDay?simDay.date:today;
       v.querySelectorAll('.dsec,.nrow,.more').forEach(function(x){ x.remove(); });
+      for(i=0;i<7;i++) days.push(add(today,i));
+      if(!days.some(function(d){ return d.getTime()===base.getTime(); })) days.unshift(base);
+      var sel=days.filter(function(d){ return d.getTime()===phone._day; })[0]||base;
+      function isLater(d){ return simDay&&d.getTime()===simDay.date.getTime()?simDay.later:d>today; }
+      function name(d){ return d.getTime()===today.getTime()?'오늘':d.getTime()===add(today,1).getTime()?'내일':DOW[d.getDay()]; }
+      phone._viewing=sel.getTime();
       var bar=document.createElement('div'); bar.className='days'; bar.setAttribute('role','group'); bar.setAttribute('aria-label','알림 볼 날짜');
-      for(var i=0;i<7;i++){
-        var d=add(today,i), cnt=dayEls(d,i>0).length, c=document.createElement('button');
-        c.type='button'; c.className='dayc'+(i===k?' on':'')+(cnt?'':' none'); c.setAttribute('data-day',i);
-        c.setAttribute('aria-pressed',i===k);
-        c.setAttribute('aria-label',(i===0?'오늘 ':i===1?'내일 ':'')+full(d)+' 알림 '+(cnt?cnt+'개':'없음'));
-        var l=document.createElement('span'); l.textContent=i===0?'오늘':i===1?'내일':DOW[d.getDay()];
-        var m=document.createElement('b'); m.textContent=d.getDate();
+      bar.style.gridTemplateColumns='repeat('+days.length+',1fr)';
+      days.forEach(function(d){
+        var cnt=dayEls(d,isLater(d)).length, on=d.getTime()===sel.getTime(), c=document.createElement('button'), nm=name(d);
+        c.type='button'; c.className='dayc'+(on?' on':'')+(cnt?'':' none'); c.setAttribute('data-day',d.getTime());
+        c.setAttribute('aria-pressed',on);
+        c.setAttribute('aria-label',(nm.length>1?nm+' ':'')+full(d)+' 알림 '+(cnt?cnt+'개':'없음'));
+        var l=document.createElement('span'), m=document.createElement('b'); l.textContent=nm; m.textContent=d.getDate();
         c.appendChild(l); c.appendChild(m); bar.appendChild(c);
-      }
+      });
       v.insertBefore(bar,v.querySelector('.h-title').nextSibling);
-      var day=add(today,k), rows=dayEls(day,k>0);
-      var e=document.createElement('div'); e.className='dsec';
-      var bb=document.createElement('b'); bb.textContent=k===0?'오늘':k===1?'내일':DOW[day.getDay()]+'요일';
-      var sp=document.createElement('span'); sp.textContent=full(day);
+      var rows=dayEls(sel,isLater(sel)), e=document.createElement('div'), bb=document.createElement('b'), sp=document.createElement('span'), nm=name(sel);
+      e.className='dsec'; bb.textContent=nm.length>1?nm:nm+'요일'; sp.textContent=full(sel);
       e.appendChild(bb); e.appendChild(sp); v.appendChild(e);
       if(!rows.length){ var p=document.createElement('p'); p.className='small'; p.textContent='일정이 없어 알림도 없어요.'; v.appendChild(p); }
       rows.forEach(function(x){ x.classList.remove('dim','now'); v.appendChild(x); });
     }
-    return {add:add,full:full,md:md,ymd:ymd,today:today,mon:mon,
-      inTerm:function(d){ return d>=new Date(2026,8,1)&&d<=TERM_END; },fillAlerts:fillAlerts,dayEls:dayEls,deps:deps,trips:trips,ownEvents:ownEvents,
+    return {add:add,full:full,md:md,ymd:ymd,iso:function(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); },today:today,mon:mon,
+      inTerm:function(d){ return d>=new Date(2026,8,1)&&d<=TERM_END; },fillAlerts:fillAlerts,stage:stage,dayEls:dayEls,deps:deps,trips:trips,ownEvents:ownEvents,
       real:function(){ var d=new Date(); return {dow:today.getDay(),date:today,t:d.getHours()*60+d.getMinutes()+d.getSeconds()/60}; },
       stale:function(){ return add(new Date(),0).getTime()!==today.getTime(); }};
   })();
@@ -1727,7 +1756,7 @@
         if(!d.results.length){ say('찾은 곳이 없어요. 적은 이름 그대로 저장돼요.'); return; }
         box.textContent='';
         d.results.forEach(function(x){
-          var b=document.createElement('button'); b.type='button'; b.className='pl-item'; b.setAttribute('data-place-pick',str(x.name,40));
+          var b=document.createElement('button'); b.type='button'; b.className='pl-item'; b.setAttribute('data-place-pick',str(x.name,40)); b.dataset.x=+x.x||0; b.dataset.y=+x.y||0;
           var n=document.createElement('b'); n.textContent=str(x.name,40);
           var a=document.createElement('span'); a.textContent=str(x.address,80);
           b.appendChild(n); b.appendChild(a); box.appendChild(b);
@@ -1736,7 +1765,9 @@
   }
   function pickPlace(phone,el){
     var form=phone.querySelector('[data-form="new"]'); if(!form) return;
-    form.querySelector('[name="placeq"]').value=el.getAttribute('data-place-pick');
+    // 지하철역은 이름 뒤의 호선을 뗀다 ("홍대입구역 2호선 09:50 도착"이 열차 시각으로 읽히지 않게)
+    form.querySelector('[name="placeq"]').value=el.getAttribute('data-place-pick').replace(/^(\S+역)\s+(?:\S*\d호선|경의중앙선|수인분당선|신분당선|공항철도|경춘선|경강선|서해선|신림선|우이신설선|의정부경전철|에버라인|김포골드라인|GTX-?[A-D])$/,'$1');
+    form.querySelector('[name="px"]').value=el.dataset.x; form.querySelector('[name="py"]').value=el.dataset.y;
     form.querySelector('[data-place-list]').textContent='';
     clearSegs(form); saveDraft(phone);
   }
@@ -1774,28 +1805,54 @@
     });
     return found;
   }
+  // 저장한 뒤 예시 집(신림동)에서 가는 실제 대중교통 경로를 한 번 묻는다. 못 찾으면 예시 이동 시간을 그대로 쓴다
+  function findRoute(phone,at,d){
+    if(!d.place||d.place==='집'||d.place==='학교') return;
+    fetch('/api/route',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({q:d.place,x:+d.px||0,y:+d.py||0,by:toM(d.start)-10,dow:new Date(+d.date.slice(0,4),+d.date.slice(5,7)-1,+d.date.slice(8,10)).getDay()})})
+      .then(function(r){ return r.json(); }).catch(function(){ return null; })
+      .then(function(r){
+        var rt=r&&r.ok?cleanRoute(r):null; if(!rt) return;
+        var list=loadEvents(), hit=list.filter(function(x){ return x.at===at; })[0];
+        if(!hit) return;                           // 그사이 지웠으면 그만
+        hit.route=rt; store.set(KEY_EVENTS,list);
+        document.querySelectorAll('.phone').forEach(function(p){ var tid=p._stack[p._stack.length-1].id; if(tid==='alerts') render(p); else if(tid==='schedule') renderWeek(p); });
+        var n=sim.reload();
+        toast(phone,'가는 길을 찾았어요 · 이동 '+rt.min+'분'+(n?' · 그날 알림 '+n+'개':''));
+      });
+  }
+  function cleanRoute(r){
+    if(!r||typeof r!=='object'||!Array.isArray(r.rides)||!(+r.min>0&&+r.min<=240)) return null;
+    var rides=r.rides.slice(0,6).map(function(x){
+      x=x||{};
+      return {line:str(x.line,14),from:str(x.from,18),to:str(x.to,18),at:Math.max(0,Math.min(240,Math.round(+x.at)||0)),dur:Math.max(1,Math.min(240,Math.round(+x.dur)||1)),tt:x.tt===true,nx:str(x.nx,18)};
+    }).filter(function(x){ return x.line&&x.from&&x.to; });
+    return rides.length?{min:Math.round(+r.min),rides:rides}:null;
+  }
   function saveEvent(phone){
     var form=phone.querySelector('[data-form="new"]');
     if(!form) return;
     var d=readForm(form);
-    d.title=(d.title||'').trim(); d.memo=(d.memo||'').trim();
-    if(!d.title){ toast(phone,'제목을 적어 주세요'); return; }
-    if(!d.date){ toast(phone,'날짜를 골라 주세요'); return; }
-    if(!d.start||!d.end){ toast(phone,'시작·종료 시각을 골라 주세요'); return; }
-    if(d.end<=d.start){ toast(phone,'종료 시각이 시작보다 늦어야 해요'); return; }
     // 검색 칸에 적은 곳이 있으면 그곳, 없으면 고른 집·학교
     d.place=(d.placeq||'').trim().slice(0,40)||d.place;
+    if(commit(phone,d)) store.remove(KEY_DRAFT);
+  }
+  // 확인하고 저장한다. 저장했으면 true
+  function commit(phone,d){
+    d.title=(d.title||'').trim(); d.memo=(d.memo||'').trim();
+    if(!d.title){ toast(phone,'제목을 적어 주세요'); return false; }
+    if(!d.date){ toast(phone,'날짜를 골라 주세요'); return false; }
+    if(!d.start||!d.end){ toast(phone,'시작·종료 시각을 골라 주세요'); return false; }
+    if(d.end<=d.start){ toast(phone,'종료 시각이 시작보다 늦어야 해요'); return false; }
     var hit=clash(d);
     if(hit){
       var msg='‘'+hit.title+'’ '+hit.when+'와 겹쳐요. 날짜나 시간을 바꿔 주세요.', box=phone.querySelector('[data-clash]');
       box.textContent=msg; box.hidden=false;
       box.scrollIntoView({block:'nearest'});
-      return;
+      return false;
     }
     var list=loadEvents();
     list.push({title:d.title,date:d.date,start:d.start,end:d.end,repeat:d.repeat,place:d.place,memo:d.memo,at:Date.now()});
     store.set(KEY_EVENTS,list);
-    store.remove(KEY_DRAFT);
     goTab(phone,'schedule');
     // 넣은 주를 열어 바로 보이게 한다
     var sp=d.date.split('-'), sd=new Date(+sp[0],+sp[1]-1,+sp[2]), at=list[list.length-1].at;
@@ -1806,6 +1863,8 @@
     if(own) vw.scrollTop+=own.getBoundingClientRect().top-vw.getBoundingClientRect().top-vw.clientHeight/2;
     toast(phone,dayText(d.date,d.repeat)+' '+d.start+' 시간표에 넣었어요'+(made?' · 그날 알림 '+made+'개':''));
     warnIfNoStore(phone);
+    findRoute(phone,at,d);
+    return true;
   }
   // 일정 화면 시간표: 고른 주(phone._week)의 날짜와 저장한 일정을 그린다. 고객이 쓴 글은 textContent 로만 넣는다
   var HOUR=40, DAY0=8*60, DAY1=24*60;              // 한 시간 높이(px) · 시간표 8시–24시
@@ -1823,6 +1882,7 @@
     body.querySelectorAll('.gcol').forEach(function(col,i){
       var d=cal.add(mon,i), key=cal.ymd(d);
       col.classList.toggle('today',d.getTime()===cal.today.getTime());
+      col.querySelectorAll('.ev.own,.ev.mvo').forEach(function(x){ x.remove(); });
       col.querySelectorAll(w===0?'[data-other]':'[data-once]').forEach(function(x){ x.remove(); });
       if(w!==0&&!cal.inTerm(d)) col.querySelectorAll('.ev.cl,.ev.mv').forEach(function(x){ x.remove(); });  // 학기 밖에는 수업이 없다
       list.forEach(function(x){
@@ -1842,6 +1902,19 @@
         e.appendChild(document.createTextNode(x.title));
         var tm=document.createElement('div'); tm.className='tm'; tm.textContent=x.start; e.appendChild(tm);
         col.appendChild(e);
+      });
+      // 등록한 일정 앞의 이동 칸: 출발 시각부터 시작까지 (알림과 같은 계산). 앞 일정과 겹치면 그 끝에서부터
+      cal.trips(d,false).filter(function(x){ return x.own; }).forEach(function(x){
+        var en=(x.st-DAY0)*HOUR/60, top=Math.max(0,(x.dep-DAY0)*HOUR/60), own=col.querySelector('.ev.own[data-at="'+x.id+'"]');
+        if(!own||en>(DAY1-DAY0)*HOUR/60) return;
+        col.querySelectorAll('.ev:not(.mv)').forEach(function(o){
+          var b=parseFloat(o.style.top)+parseFloat(o.style.height);
+          if(o!==own&&b>top&&b<=en) top=b;
+        });
+        if(en-top<6) return;
+        var m=document.createElement('div'); m.className='ev mv mvo'+(own.classList.contains('half')?' half':'');
+        m.style.top=top+'px'; m.style.height=(en-top)+'px'; m.textContent='이동';
+        col.appendChild(m);
       });
     });
   }
@@ -1884,6 +1957,19 @@
       if(r&&r.ok&&r.arrivals.length){ live.subway=r.arrivals; applyLiveAll(); }
     });
   }
+  // "11월 27일 (금)" → "2026-11-27". 반년 넘게 지난 날짜로 읽히면 다음 해로 본다
+  function isoOf(t){
+    var m=/(\d{1,2})월\s*(\d{1,2})일/.exec(t||''); if(!m) return '';
+    var d=new Date(cal.today.getFullYear(),+m[1]-1,+m[2]);
+    if(cal.today-d>183*864e5) d=new Date(d.getFullYear()+1,d.getMonth(),d.getDate());
+    return cal.iso(d);
+  }
+  function saveImport(phone){
+    var f=phone.querySelector('[data-form="imp"]'), d={}; if(!f) return;
+    f.querySelectorAll('input[name]').forEach(function(i){ d[i.name]=i.value; });
+    d.repeat='한 번'; d.place=(d.place||'').trim(); d.memo='';
+    commit(phone,d);
+  }
   function readMessageWithAI(phone,btn){
     var poster=btn.dataset.ai==='poster';
     btn.disabled=true;
@@ -1891,10 +1977,18 @@
     getJSON('/api/parse-message'+(poster?'?source=poster':'')).then(function(r){
       btn.disabled=false;
       var box=phone.querySelector('[data-ai-result]');
-      if(!r||!r.ok||!box){ toast(phone,'지금은 AI를 쓸 수 없어 예시 결과를 보여 드려요'); return; }
-      var v=box.querySelectorAll('.fv'), vals=[r.title,r.date,r.time,r.place];
-      vals.forEach(function(s,i){ if(s&&v[i]) v[i].textContent=s; });
-      toast(phone,'AI가 읽은 결과로 바꿨어요. 저장 전에 확인해 주세요');
+      if(!box) return;
+      var ok=r&&r.ok, tm=ok?/(\d{1,2}:\d{2})(?:\s*[–~-]\s*(\d{1,2}:\d{2}))?/.exec(r.time||''):null;
+      // AI 를 쓸 수 없으면 예시 결과. 메시지에 없는 종료 시각은 넣지 않는다
+      var v=ok?{title:r.title,date:isoOf(r.date),start:tm?tm[1]:'',end:tm&&tm[2]||'',place:r.place}
+        :poster?{title:'가을 진로·취업 박람회',date:'2026-10-15',start:'13:00',end:'17:00',place:'학생회관 대강당'}
+        :{title:'저녁 약속',date:cal.iso(cal.add(cal.mon,4)),start:'18:00',end:'',place:'신촌역 2번 출구'};
+      ['title','date','start','end','place'].forEach(function(k){
+        var x=v[k]||''; if((k==='start'||k==='end')&&x.length===4) x='0'+x;
+        box.querySelector('[name="'+k+'"]').value=x;
+      });
+      var cb=phone.querySelector('[data-clash]'); if(cb) cb.hidden=true;
+      toast(phone,ok?'AI가 읽었어요. 틀린 곳은 고치고 저장해 주세요':'지금은 AI를 쓸 수 없어 예시 결과를 보여 드려요');
     });
   }
 
@@ -2009,7 +2103,7 @@
       el.classList.add('on');
       if(el.closest('[data-field="place"]')){   // 집·학교를 고르면 검색 칸은 비운다
         var pf=el.closest('[data-form]'), pq=pf&&pf.querySelector('[name="placeq"]');
-        if(pq){ pq.value=''; pf._pq=(pf._pq||0)+1; pf.querySelector('[data-place-list]').textContent=''; }
+        if(pq){ pq.value=''; pf.querySelector('[name="px"]').value=pf.querySelector('[name="py"]').value=''; pf._pq=(pf._pq||0)+1; pf.querySelector('[data-place-list]').textContent=''; }
       }
       if(el.dataset.snd) toast(phone,'소리: '+el.dataset.snd);
       if(el.closest('[data-form]')){ saveDraft(phone); var cb=phone.querySelector('[data-clash]'); if(cb) cb.hidden=true; }
@@ -2028,6 +2122,7 @@
       var dc=phone.querySelector('[data-day="'+phone._day+'"]'); if(dc) dc.focus({preventScroll:true});
       return;
     }
+    if(el.hasAttribute('data-save-imp')){ saveImport(phone); return; }
     if(el.hasAttribute('data-place-search')){ searchPlace(phone); return; }
     if(el.hasAttribute('data-place-pick')){ pickPlace(phone,el); return; }
     if(el.classList.contains('sb')){ step(el); return; }
@@ -2099,6 +2194,7 @@
     if(phone&&e.target.name==='placeq'){        // 직접 적기 시작하면 집·학교 선택을 푼다
       var f=e.target.closest('[data-form]');
       f._pq=(f._pq||0)+1; f.querySelector('[data-place-list]').textContent='';
+      f.querySelector('[name="px"]').value=f.querySelector('[name="py"]').value='';   // 글자를 고치면 고른 좌표는 버린다
       if(e.target.value.trim()) clearSegs(f);
     }
     if(phone&&e.target.closest('[data-form]')){ saveDraft(phone); var cb=phone.querySelector('[data-clash]'); if(cb) cb.hidden=true; }
@@ -2207,7 +2303,8 @@
       var old=homePhone.querySelector('.hu'); if(old) old.remove();
       if(waitRing){ waitRing=null; goTab(homePhone,'home'); }
       $('sim-day').value=date.getTime();
-      if(active) document.querySelectorAll('.phone').forEach(function(p){ if(p._stack[p._stack.length-1].id==='alerts') render(p); });
+      // 날을 바꾸면 알림 화면도 그날로 돌아온다
+      if(active) document.querySelectorAll('.phone').forEach(function(p){ p._day=0; if(p._stack[p._stack.length-1].id==='alerts') render(p); });
       if(homePhone._stack) refresh(); else ui();
     }
     function all(){ return EVENTS.concat(extra).sort(function(a,b){ return a.min-b.min; }); }
@@ -2234,6 +2331,31 @@
       if(sec>=3600) return Math.floor(sec/3600)+'시간 '+Math.floor(sec%3600/60)+'분';
       return ('0'+Math.floor(sec/60)).slice(-2)+':'+('0'+sec%60).slice(-2);
     }
+    // 타러 가는 역의 실시간 도착. 20초에 한 번만 묻고, 키가 없거나 실패하면 숨긴다.
+    // 하루 빨리 보기 중에는 위젯의 시각과 다른 "지금 실제" 값이라 위젯 밖에 따로 보여 준다
+    var rt={key:'',at:0,list:null,hm:'',off:0};
+    function showLive(w,r){
+      var el=w.querySelector('.w-live'), box=w.parentNode.querySelector('.now-box');
+      if(!r){ el.hidden=box.hidden=true; return; }
+      var key=r.from+'|'+r.line+'|'+r.nx, now=Date.now();
+      if(rt.key!==key){ rt.key=key; rt.at=0; rt.list=null; }
+      if(now-rt.at>20000 && now>rt.off && !document.hidden){
+        rt.at=now;
+        fetch('/api/subway',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({station:r.from,line:r.line,next:r.nx})})
+          .then(function(x){ return x.json(); }).catch(function(){ return null; })
+          .then(function(d){
+            if(rt.key!==key) return;
+            if(!d||!d.ok||!Array.isArray(d.arrivals)){ rt.list=null; rt.off=Date.now()+60000; }        // 안 되면 1분 쉰다
+            else{ var n=new Date(); rt.list=d.arrivals.map(function(a){ return str(a,16); }); rt.hm=('0'+n.getHours()).slice(-2)+':'+('0'+n.getMinutes()).slice(-2); }
+            document.querySelectorAll('.phone').forEach(decorate);   // 시계가 멈춰 있어도 바로 보이게
+          });
+      }
+      var txt=rt.list?(rt.list.length?rt.list.join(', '):'오는 열차 없음'):'';
+      el.hidden=!txt||active; box.hidden=!txt||!active;
+      el.textContent='실시간 '+r.from+' · '+txt+' ('+rt.hm+' 기준)';
+      box.querySelector('b').textContent='지금 실제 '+r.from+' '+r.line+' · '+txt;
+      box.querySelector('span').textContent='실제 시각 '+rt.hm+' 기준이에요. 위 위젯은 '+cal.full(date)+' 시각이에요.';
+    }
     function decorate(phone){
       var c=active?{date:date,t:t,later:later()}:cal.real(), trs=cal.trips(c.date,!!c.later);
       var tr=trs.filter(function(x){ return c.t>=x.dep&&c.t<x.arr; })[0];
@@ -2255,7 +2377,7 @@
       rows.forEach(function(r){
         var m=toMin(r.dataset.time);
         r.classList.remove('now','dim');
-        if(!active&&phone._day) return;            // 오늘이 아닌 날은 지난 알림이 없다
+        if(phone._viewing!==c.date.getTime()) return;   // 시계가 가는 날만 지난 알림을 흐리게
         if(m<=c.t){ r.classList.add('dim'); cur=r; }
       });
       if(cur){ cur.classList.remove('dim'); cur.classList.add('now'); }
@@ -2264,7 +2386,11 @@
         live.hidden=!tr;                           // 이동하는 동안에만
         if(tr){
           live.querySelector('.ttl').textContent=tr.ttl; live.querySelector('.met').textContent=tr.met;
-          live.querySelector('.bus').hidden=live.querySelector('.cta').hidden=!!tr.own;   // 노선 예시는 학교 길에만 있다
+          var sg=cal.stage(tr,c.t), bus=live.querySelector('.bus');
+          bus.querySelector('.ride-now').textContent=sg.big+' · '+sg.next;
+          // 도착 숫자와 상단 알림 예시는 학교 길에만 있다
+          bus.querySelectorAll('.st,.bl').forEach(function(x){ x.style.display=tr.own?'none':''; });
+          live.querySelector('.cta').hidden=!!tr.own;
         }
       }
       // 홈 화면 위젯: 다음 출발과 남은 시간
@@ -2272,7 +2398,22 @@
       if(hs.length){ hs[0].textContent=fmt(c.t); hs[1].textContent=cal.full(c.date); }
       var w=phone.querySelector('.widget');
       if(w){
-        var nx=null, k;
+        var nx=null, k, lab=w.querySelector('.w-lab'), cdl=w.querySelector('.w-cd').firstChild;
+        if(tr){
+          // 이동 중에는 다음 출발이 아니라 지금 탈 것을 보여 준다
+          var st=cal.stage(tr,c.t);
+          lab.textContent='길메이트 · 이동 중'; w.querySelector('.w-dep').textContent=st.big;
+          cdl.data=st.lab+' '; w.querySelector('[data-countdown]').textContent=cd(Math.max(0,Math.round(st.left*60)));
+          // 도착 시각은 예상이면 "쯤"을 붙인다. 타는 중에는 다음에 할 일과 함께
+          var rs=tr.rides||[], due=tr.at+(rs.length&&rs.every(function(x){ return x.tt; })?'':'쯤')+' 도착';
+          w.querySelector('.w-dest').textContent=st.ride?st.next+' · '+due:(tr.to||'학교')+' '+due;
+          w.querySelector('.w-wake').hidden=true;
+          w.setAttribute('aria-label','길메이트 위젯: 이동 중, '+st.big);
+          showLive(w,st.wait);
+          return;
+        }
+        showLive(w,null);
+        lab.textContent='길메이트 · 다음 출발'; cdl.data='출발까지 ';
         for(k=0;k<8&&!nx;k++){
           var day=cal.add(c.date,k), list=cal.deps(day,k>0||!!c.later);
           for(var j=0;j<list.length&&!nx;j++){
@@ -2283,7 +2424,7 @@
         w.querySelector('.w-dep').textContent=nx.pre+nx.d.time+' 출발';
         w.querySelector('[data-countdown]').textContent=cd(Math.max(0,Math.round(nx.left)));
         w.querySelector('.w-dest').textContent=nx.d.dest;
-        w.querySelector('.w-wake').textContent=nx.d.sub;
+        w.querySelector('.w-wake').hidden=false; w.querySelector('.w-wake').textContent=nx.d.sub;
         w.setAttribute('aria-label','길메이트 위젯: '+nx.pre+nx.d.time+' 출발');
       }
     }
@@ -2355,7 +2496,7 @@
       if(active) return;
       active=true;
       // 실제 오늘 목록을 시연하는 날 목록으로 바꾼다
-      document.querySelectorAll('.phone').forEach(function(p){ if(p._stack[p._stack.length-1].id==='alerts') render(p); });
+      document.querySelectorAll('.phone').forEach(function(p){ p._day=0; if(p._stack[p._stack.length-1].id==='alerts') render(p); });
       refresh();
     }
 
@@ -2371,9 +2512,9 @@
       setDay(date);
       goTab(homePhone,'home');
     });
-    $('sim-day').addEventListener('change',function(e){ activate(); setDay(new Date(+e.target.value)); });
+    $('sim-day').addEventListener('change',function(e){ var v=+e.target.value; activate(); setDay(new Date(v)); });
     $('sim-sound').addEventListener('click',function(){ audio.setOn(!audio.isOn()); activate(); ui(); });
-    $('sim-range').addEventListener('input',function(e){ activate(); advance(+e.target.value,false); });
+    $('sim-range').addEventListener('input',function(e){ var v=+e.target.value; activate(); advance(v,false); });
     document.querySelectorAll('.sim [data-speed]').forEach(function(b){
       b.addEventListener('click',function(){ activate(); speed=+b.dataset.speed; ui(); });
     });
@@ -2384,6 +2525,11 @@
       isActive:function(){ return active; },
       day:function(){ return {date:date,later:later()}; },
       refreshDays:refreshDays,
+      reload:function(){
+        if(playing||waitRing||t!==START){ loadDay(); var r=$('sim-range'); r.min=MIN; r.max=MAX; t=Math.max(MIN,Math.min(MAX,t)); refresh(); }
+        else setDay(date);
+        return EVENTS.length;
+      },
       // 방금 등록한 날로 시연 날짜를 맞춘다 (매주 일정은 앞으로 처음 오는 날). 그 일정으로 생긴 날의 알림 개수를 돌려준다
       pick:function(sd){
         refreshDays();
