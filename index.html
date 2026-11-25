@@ -132,7 +132,7 @@
   .fld input.fv:focus{outline:none;border-color:#2563EB;background:#fff;}
   /* 시간표에 들어간 내 일정 */
   .ev.own{box-shadow:0 0 0 1.5px #0b5a4a inset;}
-  .ev.own.half{left:50%;}
+  .ev.own.half,.ev.mvo.half{left:50%;}
   .wknav .arw{cursor:pointer;user-select:none;padding:8px 0;}
   .clash{font-size:13px;font-weight:600;line-height:1.45;color:#9B1C1C;background:#FDECEC;border-radius:9px;padding:9px 11px;margin:0 0 10px;word-break:break-all;}
   .pl-row{display:flex;gap:6px;margin-top:8px;}
@@ -1617,8 +1617,8 @@
       var rs=tr.rides||[], end={big:rs.length?'걸어서 도착하는 중':'이동 중',lab:'도착까지',left:tr.arr-t,next:tr.ttl};
       for(var i=0;i<rs.length;i++){
         var r=rs[i], on=tr.dep+r.at, off=on+r.dur;
-        if(t<on) return {big:r.line+' '+hm(on),lab:i?r.from+'에서 갈아타는 중 · 타기까지':r.from+'까지 걷는 중 · 타기까지',left:on-t,next:r.from+'에서 타고 '+r.to+'까지',tt:r.tt,wait:r.nx?r:null};
-        if(t<off) return {big:r.line+' 타는 중',lab:r.to+'까지',left:off-t,next:rs[i+1]?r.to+'에서 '+rs[i+1].line+' 환승':r.to+'에서 내려요',tt:r.tt};
+        if(t<on) return {big:r.line+' '+hm(on)+(r.tt?'':'쯤'),lab:i?r.from+'에서 갈아타는 중 · 타기까지':r.from+'까지 걷는 중 · 타기까지',left:on-t,next:r.from+'에서 타고 '+r.to+'까지',tt:r.tt,wait:r.nx?r:null};
+        if(t<off) return {ride:true,big:r.line+' 타는 중',lab:r.to+'까지',left:off-t,next:rs[i+1]?r.to+'에서 '+rs[i+1].line+' 환승':r.to+'에서 내려요',tt:r.tt};
       }
       return end;
     }
@@ -1647,14 +1647,17 @@
         woke=true;
         var rides=rt?rt.rides:[], first=rides[0];
         // 경로를 알면 처음 탈 곳으로, 모르면 도착할 곳으로 알린다
-        out.rows.push(row(hm(dep),'출발','go',first?ro(first.from)+' 출발할 시간':at+' · 출발할 시간',x.title+' '+x.start+' · '+at+'까지 '+(rt?'':'약 ')+go+'분'));
+        out.rows.push(row(hm(dep),'출발','go',first?ro(first.from)+' 출발할 시간':at+' · 출발할 시간',(first?first.line+' '+hm(dep+first.at)+(first.tt?'':'쯤')+' 탑승 · ':'')+x.title+' '+x.start+(first?'':' · '+at+'까지 '+(rt?'':'약 ')+go+'분')));
         rides.forEach(function(r,i){
-          if(i===0) out.rows.push(row(hm(dep+r.at),'정류장·역','stn',r.from+' 도착',r.line+' '+hm(dep+r.at)+(r.tt?'':'쯤')+' 탑승 → '+r.to));
-          else out.rows.push(row(hm(dep+Math.max(0,rides[i-1].at+rides[i-1].dur-2)),'정류장·역','stn','곧 '+rides[i-1].to+' 환승','내려서 '+r.line+' '+hm(dep+r.at)+(r.tt?'':'쯤')+' 탑승 → '+r.to));
+          // 처음 타는 곳은 도착을 알리지 않는다 (탈 것과 시각은 출발 알림에 있다)
+          if(i) out.rows.push(row(hm(dep+Math.max(0,rides[i-1].at+rides[i-1].dur-2)),'정류장·역','stn','곧 '+rides[i-1].to+' 환승','내려서 '+r.line+' '+hm(dep+r.at)+(r.tt?'':'쯤')+' 탑승 → '+r.to));
         });
+        // 마지막 차에서 내리기 2분 전
+        var last=rides[rides.length-1];
+        if(last) out.rows.push(row(hm(dep+last.at+Math.max(0,last.dur-2)),'정류장·역','stn','곧 '+last.to+'에서 내려요',last.line+' '+hm(dep+last.at+last.dur)+(last.tt?'':'쯤')+' 도착 · 내릴 준비를 하세요'));
         out.rows.push(row(hm(dep+go),'도착','arr',at+' 도착 예정','지금: '+x.title+' '+x.start));
         out.deps.push({at:dep,time:hm(dep),dest:at+' · '+x.title+' '+x.start,sub:(first?first.from+' '+first.line+' · ':'')+'이동 '+(rt?'':'약 ')+go+'분'});
-        out.trips.push({dep:dep,arr:dep+go,own:true,rides:rides,at:hm(dep+go),ttl:at+' · '+x.title+' '+x.start,met:'출발 '+hm(dep)+' · 도착 예정 '+hm(dep+go)+' · 약 '+go+'분'});
+        out.trips.push({id:x.at,to:at,st:st,dep:dep,arr:dep+go,own:true,rides:rides,at:hm(dep+go),ttl:at+' · '+x.title+' '+x.start,met:'출발 '+hm(dep)+' · 도착 예정 '+hm(dep+go)+' · 약 '+go+'분'});
       });
       return out;
     }
@@ -1811,7 +1814,7 @@
         var list=loadEvents(), hit=list.filter(function(x){ return x.at===at; })[0];
         if(!hit) return;                           // 그사이 지웠으면 그만
         hit.route=rt; store.set(KEY_EVENTS,list);
-        document.querySelectorAll('.phone').forEach(function(p){ if(p._stack[p._stack.length-1].id==='alerts') render(p); });
+        document.querySelectorAll('.phone').forEach(function(p){ var tid=p._stack[p._stack.length-1].id; if(tid==='alerts') render(p); else if(tid==='schedule') renderWeek(p); });
         var n=sim.reload();
         toast(phone,'가는 길을 찾았어요 · 이동 '+rt.min+'분'+(n?' · 그날 알림 '+n+'개':''));
       });
@@ -1878,6 +1881,7 @@
     body.querySelectorAll('.gcol').forEach(function(col,i){
       var d=cal.add(mon,i), key=cal.ymd(d);
       col.classList.toggle('today',d.getTime()===cal.today.getTime());
+      col.querySelectorAll('.ev.own,.ev.mvo').forEach(function(x){ x.remove(); });
       col.querySelectorAll(w===0?'[data-other]':'[data-once]').forEach(function(x){ x.remove(); });
       if(w!==0&&!cal.inTerm(d)) col.querySelectorAll('.ev.cl,.ev.mv').forEach(function(x){ x.remove(); });  // 학기 밖에는 수업이 없다
       list.forEach(function(x){
@@ -1897,6 +1901,19 @@
         e.appendChild(document.createTextNode(x.title));
         var tm=document.createElement('div'); tm.className='tm'; tm.textContent=x.start; e.appendChild(tm);
         col.appendChild(e);
+      });
+      // 등록한 일정 앞의 이동 칸: 출발 시각부터 시작까지 (알림과 같은 계산). 앞 일정과 겹치면 그 끝에서부터
+      cal.trips(d,false).filter(function(x){ return x.own; }).forEach(function(x){
+        var en=(x.st-DAY0)*HOUR/60, top=Math.max(0,(x.dep-DAY0)*HOUR/60), own=col.querySelector('.ev.own[data-at="'+x.id+'"]');
+        if(!own||en>(DAY1-DAY0)*HOUR/60) return;
+        col.querySelectorAll('.ev:not(.mv)').forEach(function(o){
+          var b=parseFloat(o.style.top)+parseFloat(o.style.height);
+          if(o!==own&&b>top&&b<=en) top=b;
+        });
+        if(en-top<6) return;
+        var m=document.createElement('div'); m.className='ev mv mvo'+(own.classList.contains('half')?' half':'');
+        m.style.top=top+'px'; m.style.height=(en-top)+'px'; m.textContent='이동';
+        col.appendChild(m);
       });
     });
   }
@@ -2386,8 +2403,10 @@
           var st=cal.stage(tr,c.t);
           lab.textContent='길메이트 · 이동 중'; w.querySelector('.w-dep').textContent=st.big;
           cdl.data=st.lab+' '; w.querySelector('[data-countdown]').textContent=cd(Math.max(0,Math.round(st.left*60)));
-          w.querySelector('.w-dest').textContent=st.next;
-          w.querySelector('.w-wake').textContent=(st.tt?'열차 시간표 기준':'예상 시각')+' · 도착 '+tr.at+' · '+tr.ttl;
+          // 도착 시각은 예상이면 "쯤"을 붙인다. 타는 중에는 다음에 할 일과 함께
+          var rs=tr.rides||[], due=tr.at+(rs.length&&rs.every(function(x){ return x.tt; })?'':'쯤')+' 도착';
+          w.querySelector('.w-dest').textContent=st.ride?st.next+' · '+due:(tr.to||'학교')+' '+due;
+          w.querySelector('.w-wake').hidden=true;
           w.setAttribute('aria-label','길메이트 위젯: 이동 중, '+st.big);
           showLive(w,st.wait);
           return;
@@ -2404,7 +2423,7 @@
         w.querySelector('.w-dep').textContent=nx.pre+nx.d.time+' 출발';
         w.querySelector('[data-countdown]').textContent=cd(Math.max(0,Math.round(nx.left)));
         w.querySelector('.w-dest').textContent=nx.d.dest;
-        w.querySelector('.w-wake').textContent=nx.d.sub;
+        w.querySelector('.w-wake').hidden=false; w.querySelector('.w-wake').textContent=nx.d.sub;
         w.setAttribute('aria-label','길메이트 위젯: '+nx.pre+nx.d.time+' 출발');
       }
     }

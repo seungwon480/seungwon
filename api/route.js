@@ -88,6 +88,8 @@ function shorten(route, from0, to0) {
   return { total: total + Math.ceil(head) + Math.ceil(foot), rides, tail: Math.ceil(walk + foot) };
 }
 
+// 걸어서나 버스에서 내려 지하철역에 들어갈 때 개찰구를 지나 승강장까지 가는 시간(분, 어림값)
+const PLATFORM = 3;
 // 도착해야 할 시각에서 거꾸로 계산한다. 지하철은 시간표의 실제 열차로, 못 찾으면 카카오 예상 시간으로
 async function backward(plan, day, by) {
   let t = by - plan.tail;
@@ -99,7 +101,8 @@ async function backward(plan, day, by) {
     const arr = hit ? hit.arr : t;
     const dep = hit ? hit.dep : Math.round(t - r.dur);
     out.unshift({ m: r.m, line: r.line, from: r.from, to: r.to, nx: r.nx, dep, arr, tt: !!hit });
-    t = Math.floor(dep - r.walk - (hit ? 1 : r.wait)); // 시간표 열차는 1분 먼저 승강장에
+    const enter = r.m === 'sub' && !(i > 0 && plan.rides[i - 1].m === 'sub') ? PLATFORM : 0;
+    t = Math.floor(dep - enter - r.walk - (hit ? 1 : r.wait)); // 시간표 열차는 1분 먼저 승강장에
   }
   const min = by - t;
   if (!(min > 0 && min <= 240)) return null;
