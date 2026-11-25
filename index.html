@@ -470,6 +470,7 @@
   .sim{max-width:820px;margin:0 auto 26px;background:#fff;border-radius:14px;padding:14px 18px;display:flex;flex-direction:column;gap:10px;}
   .sim-top{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;}
   .sim-lab{font-size:13px;font-weight:700;color:#2563EB;}
+  .sim-day{border:1.4px solid #D5DAE2;background:#fff;color:#1F2937;font-family:inherit;font-size:13px;font-weight:600;padding:7px 8px;border-radius:9px;max-width:100%;}
   .sim-clock{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;color:#111827;letter-spacing:-.01em;line-height:1.2;}
   .sim-clock small{font-size:13px;font-weight:600;color:#6B7280;margin-right:6px;letter-spacing:0;}
   .sim-btns{display:flex;gap:6px;flex-wrap:wrap;}
@@ -552,7 +553,8 @@
   <section class="sim" aria-label="하루 빨리 보기">
     <div class="sim-top">
       <span class="sim-lab">하루 빨리 보기</span>
-      <span class="sim-clock"><small>9월 30일 (수)</small><span id="sim-time">06:50</span></span>
+      <select class="sim-day" id="sim-day" aria-label="시연할 날"></select>
+      <span class="sim-clock"><span id="sim-time">06:50</span></span>
       <div class="sim-btns">
         <button type="button" class="sim-b main" id="sim-play" aria-pressed="false">▶ 재생</button>
         <button type="button" class="sim-b" id="sim-next">다음 알림으로</button>
@@ -561,7 +563,7 @@
       </div>
     </div>
     <div class="sim-row">
-      <input type="range" class="sim-range" id="sim-range" min="390" max="1380" step="1" value="410" aria-label="시연 시각 (06:30–23:00)">
+      <input type="range" class="sim-range" id="sim-range" min="390" max="1380" step="1" value="410" aria-label="시연 시각">
       <span>속도</span>
       <div class="sim-btns" role="group" aria-label="속도">
         <button type="button" class="sim-b" data-speed="1" aria-pressed="false">1초 = 1분</button>
@@ -569,7 +571,7 @@
         <button type="button" class="sim-b" data-speed="5" aria-pressed="false">1초 = 5분</button>
       </div>
     </div>
-    <p class="sim-note">이번 주 수요일 예시예요. 시계를 돌리면 알림 화면에 알림이 차례로 떠요. 기상 알람은 끄기를 누를 때까지 울려요.</p>
+    <p class="sim-note">날을 고르고 시계를 돌리면 홈 화면 폰에 알림이 떠요. 일정을 등록하면 그날로 맞춰져요. 기상 알람은 끄기를 누를 때까지 울려요.</p>
   </section>
 
   <section class="screens">
@@ -583,7 +585,7 @@
   <footer>
     <button type="button" class="wipe" id="wipe-records">기록 모두 지우기</button><br>
     서강대 스타트업 연계전공 수업 과제
-    <p class="updated">마지막으로 고친 날 2026-11-24</p>
+    <p class="updated">마지막으로 고친 날 2026-11-25</p>
   </footer>
 
 </div>
@@ -1527,7 +1529,6 @@
     ['v-setup','v-schedule','v-event','v-import','v-alerts','v-alert','v-shade','m-conflict','v-home'].forEach(function(id){
       moveTree(document.getElementById(id).content);
     });
-    moveTree(document.querySelector('.sim-clock'));
     var g=document.getElementById('v-schedule').content, ti=(today.getDay()+6)%7;
     g.querySelectorAll('.ghead .dc').forEach(function(dc,i){
       var d=add(mon,i), h=dc.querySelector('.hol');
@@ -1565,7 +1566,8 @@
         laterRows:trip('07:27','08:07','08:13','08:23','08:50','자료구조 09:00','ds','동아리 회의 18:00').concat([
           row('17:45','다음 일정','nxt','다음 일정: 동아리 회의','18:00 · 학생회관',{ev:'club'}),
           row('19:30','출발','go','오늘 일정 끝 · 귀가','집까지 43분',{route:'home',ev:'club'})]),
-        laterDeps:[{at:487,time:'08:07',dest:'학교 · 자료구조 09:00',sub:'07:27 기상 · 이동 43분'}],
+        laterDeps:[{at:487,time:'08:07',dest:'학교 · 자료구조 09:00',sub:'07:27 기상 · 이동 43분'},{at:1170,time:'19:30',dest:'집 · 오늘 일정 끝 · 귀가',sub:'동아리 회의 끝나고 · 이동 43분'}],
+        laterTrip:{dep:487,arr:530,tr:'08:23',at:'08:50',ttl:'학교 · 자료구조 09:00',met:'출발 08:07 · 도착 예정 08:50 · 43분'},
         trip:{dep:477,arr:530,tr:'08:23',at:'08:50',ttl:'학교 · 자료구조 09:00',met:'출발 07:57 · 도착 예정 08:50 · 53분 (길 막힘 +10분)'},
         deps:[{at:477,time:'07:57',dest:'학교 · 자료구조 09:00',sub:'07:17 기상 · 이동 53분 (길 막힘 +10분)'},{at:1170,time:'19:30',dest:'집 · 오늘 일정 끝 · 귀가',sub:'동아리 회의 끝나고 · 이동 43분'}]},
       4:{rows:os().concat([row('22:55','출발','go','막차 주의','스터디 끝나고 23:10 출발 → 막차까지 여유 20분 · 늦어도 23:30 출발 (2호선 교대역 막차 23:42)',{route:'home',n2:'스터디 끝나고 23:10 출발 → 막차까지 여유 20분'})]),trip:osTrip,deps:osDeps},
@@ -1593,19 +1595,66 @@
       });
       return out;
     }
+    // 직접 등록한 일정에서 그날 알림을 만든다 (브라우저에 저장된 일정만, 이동 시간은 예시 값)
+    var GO_SCHOOL=43, GO_OTHER=45, SPARE=10, PREP=40, NEXT=15;
+    function hm(m){ return ('0'+Math.floor(m/60)).slice(-2)+':'+('0'+m%60).slice(-2); }
+    function ownEvents(d){
+      return loadEvents().filter(function(x){
+        var p=x.date.split('-'), sd=new Date(+p[0],+p[1]-1,+p[2]);
+        if(isNaN(sd.getTime())||!/^\d\d:\d\d$/.test(x.start)) return false;
+        return x.repeat==='매주' ? sd.getDay()===d.getDay()&&d>=sd : sd.getTime()===d.getTime();
+      }).sort(function(a,b){ return a.start.localeCompare(b.start); });
+    }
+    function own(d,later){
+      var out={rows:[],deps:[],trips:[]}, pl=PLAN[d.getDay()], base=baseTrip(pl,later);
+      var firstBase=Math.min.apply(null,rowEls(d.getDay(),later).map(function(x){ return toM(x.dataset.time); }).concat([9999])), woke=false;
+      ownEvents(d).forEach(function(x){
+        var st=toM(x.start), at=x.place||'', school=at==='학교', go=school?GO_SCHOOL:GO_OTHER, dep=st-go-SPARE;
+        // 집에서 하는 일, 이미 학교에 있는 시간, 자정을 넘기는 출발은 시작 전 알림만
+        if(!at||at==='집'||(school&&base&&base.arr<=st)||dep<0){
+          out.rows.push(row(hm(Math.max(0,st-NEXT)),'다음 일정','nxt','다음 일정: '+x.title,[x.start,at].filter(Boolean).join(' · ')));
+          return;
+        }
+        // 그날 맨 처음 나가는 오전 일정이면 기상 알람도
+        if(!woke&&dep<12*60&&dep-PREP>=0&&dep<firstBase){
+          out.rows.push(row(hm(dep-PREP),'기상','wake','기상 알람',hm(dep)+' 출발 · '+x.title+' '+x.start+' ('+at+')'));
+        }
+        woke=true;
+        out.rows.push(row(hm(dep),'출발','go',at+' · 출발할 시간',x.title+' '+x.start+' · 이동 약 '+go+'분'));
+        out.rows.push(row(hm(dep+go),'도착','arr',at+' 도착 예정','지금: '+x.title+' '+x.start));
+        out.deps.push({at:dep,time:hm(dep),dest:at+' · '+x.title+' '+x.start,sub:'이동 약 '+go+'분'});
+        out.trips.push({dep:dep,arr:dep+go,own:true,ttl:at+' · '+x.title+' '+x.start,met:'출발 '+hm(dep)+' · 도착 예정 '+hm(dep+go)+' · 약 '+go+'분'});
+      });
+      return out;
+    }
+    function baseTrip(pl,later){ return later&&pl.laterTrip||pl.trip; }
+    function dayEls(d,later){
+      return rowEls(d.getDay(),later).concat(own(d,later).rows.map(rowEl)).sort(function(a,b){ return a.dataset.time.localeCompare(b.dataset.time); });
+    }
+    function deps(d,later){
+      var pl=PLAN[d.getDay()];
+      return (later&&pl.laterDeps||pl.deps).concat(own(d,later).deps).sort(function(a,b){ return a.at-b.at; });
+    }
+    function trips(d,later){
+      var b=baseTrip(PLAN[d.getDay()],later);
+      return (b?[b]:[]).concat(own(d,later).trips);
+    }
+
     // 알림 화면: 위에서 고른 하루(오늘부터 7일 안)의 알림만 그린다. 하루 빨리 보기 중에는 시연하는 날만
-    function fillAlerts(phone,simOn){
-      var v=phone.querySelector('.view'), k=simOn?0:(phone._day||0);
-      if(simOn){
-        var n=0;                                   // 템플릿의 첫 묶음(수요일)만 남긴다
-        [].slice.call(v.children).forEach(function(x){ if(x.classList.contains('dsec')) n++; if(n>1) x.remove(); });
-        v.querySelector('.dsec b').textContent='시연하는 날';
+    function fillAlerts(phone,simDay){
+      var v=phone.querySelector('.view'), k=phone._day||0;
+      if(simDay){
+        v.querySelectorAll('.dsec,.nrow,.more').forEach(function(x){ x.remove(); });
+        var se=document.createElement('div'), sb=document.createElement('b'), ss=document.createElement('span');
+        se.className='dsec'; sb.textContent='시연하는 날'; ss.textContent=full(simDay.date);
+        se.appendChild(sb); se.appendChild(ss); v.appendChild(se);
+        dayEls(simDay.date,simDay.later).forEach(function(x){ x.classList.remove('dim','now'); v.appendChild(x); });
         return;
       }
       v.querySelectorAll('.dsec,.nrow,.more').forEach(function(x){ x.remove(); });
       var bar=document.createElement('div'); bar.className='days'; bar.setAttribute('role','group'); bar.setAttribute('aria-label','알림 볼 날짜');
       for(var i=0;i<7;i++){
-        var d=add(today,i), cnt=rowEls(d.getDay(),i>0).length, c=document.createElement('button');
+        var d=add(today,i), cnt=dayEls(d,i>0).length, c=document.createElement('button');
         c.type='button'; c.className='dayc'+(i===k?' on':'')+(cnt?'':' none'); c.setAttribute('data-day',i);
         c.setAttribute('aria-pressed',i===k);
         c.setAttribute('aria-label',(i===0?'오늘 ':i===1?'내일 ':'')+full(d)+' 알림 '+(cnt?cnt+'개':'없음'));
@@ -1614,7 +1663,7 @@
         c.appendChild(l); c.appendChild(m); bar.appendChild(c);
       }
       v.insertBefore(bar,v.querySelector('.h-title').nextSibling);
-      var day=add(today,k), rows=rowEls(day.getDay(),k>0);
+      var day=add(today,k), rows=dayEls(day,k>0);
       var e=document.createElement('div'); e.className='dsec';
       var bb=document.createElement('b'); bb.textContent=k===0?'오늘':k===1?'내일':DOW[day.getDay()]+'요일';
       var sp=document.createElement('span'); sp.textContent=full(day);
@@ -1623,7 +1672,7 @@
       rows.forEach(function(x){ x.classList.remove('dim','now'); v.appendChild(x); });
     }
     return {add:add,full:full,md:md,ymd:ymd,today:today,mon:mon,
-      inTerm:function(d){ return d>=new Date(2026,8,1)&&d<=TERM_END; },PLAN:PLAN,fillAlerts:fillAlerts,
+      inTerm:function(d){ return d>=new Date(2026,8,1)&&d<=TERM_END; },fillAlerts:fillAlerts,dayEls:dayEls,deps:deps,trips:trips,ownEvents:ownEvents,
       real:function(){ var d=new Date(); return {dow:today.getDay(),date:today,t:d.getHours()*60+d.getMinutes()+d.getSeconds()/60}; },
       stale:function(){ return add(new Date(),0).getTime()!==today.getTime(); }};
   })();
@@ -1708,10 +1757,11 @@
     // 넣은 주를 열어 바로 보이게 한다
     var sp=d.date.split('-'), sd=new Date(+sp[0],+sp[1]-1,+sp[2]), at=list[list.length-1].at;
     phone._week=Math.floor(Math.round((sd-cal.mon)/864e5)/7);
-    document.querySelectorAll('.phone').forEach(function(p){ if(p._stack[p._stack.length-1].id==='schedule') render(p); });
+    document.querySelectorAll('.phone').forEach(function(p){ var tid=p._stack[p._stack.length-1].id; if(tid==='schedule'||tid==='alerts') render(p); });
+    var made=sim.pick(sd);
     var own=phone.querySelector('.ev.own[data-at="'+at+'"]'), vw=phone.querySelector('.view');
     if(own) vw.scrollTop+=own.getBoundingClientRect().top-vw.getBoundingClientRect().top-vw.clientHeight/2;
-    toast(phone,dayText(d.date,d.repeat)+' '+d.start+' 시간표에 넣었어요');
+    toast(phone,dayText(d.date,d.repeat)+' '+d.start+' 시간표에 넣었어요'+(made?' · 그날 알림 '+made+'개':''));
     warnIfNoStore(phone);
   }
   // 일정 화면 시간표: 고른 주(phone._week)의 날짜와 저장한 일정을 그린다. 고객이 쓴 글은 textContent 로만 넣는다
@@ -1839,7 +1889,7 @@
     fill(frag,top.data||{});
     phone.innerHTML='';
     phone.appendChild(frag);
-    if(top.id==='alerts') cal.fillAlerts(phone,!!(sim&&sim.isActive()));
+    if(top.id==='alerts') cal.fillAlerts(phone,sim&&sim.isActive()?sim.day():null);
     var tab=tpl.dataset.tab;
     if(tab){
       phone.appendChild(document.getElementById('tabs-tpl').content.cloneNode(true));
@@ -1847,7 +1897,7 @@
       if(on){on.classList.add('on');on.setAttribute('aria-current','page');}
     }
     // 홈 화면 폰에서 앱으로 들어갔으면 홈 화면으로 돌아가는 버튼
-    if(phone.dataset.start==='home' && top.id!=='home'){
+    if(phone.dataset.start==='home' && top.id!=='home' && top.id!=='ring'){
       phone.insertAdjacentHTML('beforeend','<div class="home-pill" data-home>⌂ 홈 화면</div>');
     }
     var t=document.createElement('div');
@@ -2017,6 +2067,7 @@
     try{ yes=window.confirm('등록한 일정과 쓰던 내용을 모두 지울까요? 되돌릴 수 없어요.'); }catch(e){ yes=false; }
     if(!yes) return;
     store.clearAll();
+    sim.refreshDays();
     var first=null;
     document.querySelectorAll('.phone').forEach(function(p){
       if(p.dataset.start==='schedule'){ goTab(p,'schedule'); first=p; }
@@ -2078,27 +2129,47 @@
     return api;
   })();
 
-  // ── 「하루 빨리 보기」: 시연 시계를 빨리 돌려 이번 주 수요일(예시 하루) 알림을 차례로 띄운다 ──
-  //    알림 문구는 알림 목록 템플릿(v-alerts)의 「오늘」 줄을 그대로 읽어 쓴다
+  // ── 「하루 빨리 보기」: 고른 날의 알림을 시연 시계로 차례로 띄운다. 알림은 홈 화면 폰에 뜬다 ──
+  //    고를 수 있는 날: 이번 주 수요일(길 막히는 날 예시), 직접 등록한 일정이 있는 앞으로 14일
   var sim=(function(){
-    var START=410, MIN=390, MAX=1380;            // 06:50 · 06:30 · 23:00 (하루의 몇 분째)
+    var START=410, MIN=390, MAX=1380;            // 06:50 · 06:30 · 23:00 (하루의 몇 분째, 날마다 바뀐다)
     var t=START, active=false, playing=false, speed=2, timer=null, last=0;
     var extra=[], waitRing=null, resumeAfter=false, ringEv=null;
-    var alertsPhone=document.querySelector('.phone[data-start="alerts"]');
+    var homePhone=document.querySelector('.phone[data-start="home"]'), EX=cal.add(cal.mon,2), date=EX, EVENTS=[];
     function toMin(s){ var p=s.split(':'); return +p[0]*60 + +p[1]; }
     function fmt(m){ m=Math.floor(m); return ('0'+Math.floor(m/60)%24).slice(-2)+':'+('0'+m%60).slice(-2); }
-    var EVENTS=(function(){
-      var list=[], n=0;
-      document.getElementById('v-alerts').content.querySelectorAll('.dsec,.nrow').forEach(function(el){
-        if(el.classList.contains('dsec')){ n++; return; }
-        if(n!==1) return;                          // 첫 번째 묶음(오늘)만
-        var d=copyData(el); d.min=toMin(d.time); list.push(d);
+    function later(){ return date.getTime()!==EX.getTime() && date>cal.today; }
+    function loadDay(){
+      EVENTS=cal.dayEls(date,later()).map(function(el){ var d=copyData(el); d.min=toMin(d.time); return d; });
+      var ex=date.getTime()===EX.getTime(), first=EVENTS.length?EVENTS[0].min:420, lastm=EVENTS.length?EVENTS[EVENTS.length-1].min:1260;
+      MIN=Math.max(0,ex?Math.min(390,first-10):first-30); MAX=Math.min(1439,ex?Math.max(1380,lastm+5):lastm+60);
+      START=ex&&first>=410?410:Math.max(MIN,first-5);
+    }
+    function refreshDays(){
+      var sel=$('sim-day'), days=[EX], i, d, keep=false;
+      for(i=0;i<14;i++){ d=cal.add(cal.today,i); if(d.getTime()!==EX.getTime()&&cal.ownEvents(d).length) days.push(d); }
+      sel.textContent='';
+      days.forEach(function(x){
+        var o=document.createElement('option'); o.value=x.getTime();
+        o.textContent=cal.full(x)+(x.getTime()===EX.getTime()?' · 예시':' · 내 일정');
+        sel.appendChild(o); if(x.getTime()===date.getTime()) keep=true;
       });
-      return list;
-    })();
+      if(!keep) date=EX;
+      sel.value=date.getTime();
+      setDay(date);
+    }
+    function setDay(d){
+      date=d; pause(); resumeAfter=false; extra=[]; loadDay(); t=START;
+      var r=$('sim-range'); r.min=MIN; r.max=MAX;
+      var old=homePhone.querySelector('.hu'); if(old) old.remove();
+      if(waitRing){ waitRing=null; goTab(homePhone,'home'); }
+      $('sim-day').value=date.getTime();
+      if(active) document.querySelectorAll('.phone').forEach(function(p){ if(p._stack[p._stack.length-1].id==='alerts') render(p); });
+      if(homePhone._stack) refresh(); else ui();
+    }
     function all(){ return EVENTS.concat(extra).sort(function(a,b){ return a.min-b.min; }); }
 
-    var $=function(id){ return document.getElementById(id); };
+    function $(id){ return document.getElementById(id); }
     function ui(){
       $('sim-time').textContent=fmt(t);
       $('sim-range').value=Math.floor(t);
@@ -2121,11 +2192,12 @@
       return ('0'+Math.floor(sec/60)).slice(-2)+':'+('0'+sec%60).slice(-2);
     }
     function decorate(phone){
-      var c=active?{dow:3,date:cal.add(cal.mon,2),t:t}:cal.real(), tr=cal.PLAN[c.dow].trip;
+      var c=active?{date:date,t:t,later:later()}:cal.real(), trs=cal.trips(c.date,!!c.later);
+      var tr=trs.filter(function(x){ return c.t>=x.dep&&c.t<x.arr; })[0];
       var sh=phone.querySelector('.shade');
       if(sh){
         var sbs=sh.querySelectorAll('.shade-bar span'); sbs[0].textContent=fmt(c.t); sbs[1].textContent=cal.full(c.date);
-        if(tr){
+        if(tr&&!tr.own){
           sh.querySelector('.push b').textContent='학교 · '+tr.at+' 도착 예정';
           sh.querySelectorAll('.push-h')[1].lastChild.data='길메이트 · '+tr.tr;
         }
@@ -2146,8 +2218,11 @@
       if(cur){ cur.classList.remove('dim'); cur.classList.add('now'); }
       var live=phone.querySelector('.live');
       if(live){
-        live.hidden=!(tr && c.t>=tr.dep && c.t<tr.arr);   // 학교로 가는 동안에만
-        if(tr){ live.querySelector('.ttl').textContent=tr.ttl; live.querySelector('.met').textContent=tr.met; }
+        live.hidden=!tr;                           // 이동하는 동안에만
+        if(tr){
+          live.querySelector('.ttl').textContent=tr.ttl; live.querySelector('.met').textContent=tr.met;
+          live.querySelector('.bus').hidden=live.querySelector('.cta').hidden=!!tr.own;   // 노선 예시는 학교 길에만 있다
+        }
       }
       // 홈 화면 위젯: 다음 출발과 남은 시간
       var hs=phone.querySelectorAll('.hs-bar span');
@@ -2156,7 +2231,7 @@
       if(w){
         var nx=null, k;
         for(k=0;k<8&&!nx;k++){
-          var day=cal.add(c.date,k), pl=cal.PLAN[day.getDay()], list=k>0&&pl.laterDeps||pl.deps;
+          var day=cal.add(c.date,k), list=cal.deps(day,k>0||!!c.later);
           for(var j=0;j<list.length&&!nx;j++){
             if(k>0||list[j].at>c.t) nx={d:list[j],left:(k*1440+list[j].at-c.t)*60,
               pre:k===0?'':k===1?'내일 ':(day.getMonth()+1)+'/'+day.getDate()+'('+DOW[day.getDay()]+') '};
@@ -2171,7 +2246,7 @@
     }
 
     function banner(ev){
-      var p=alertsPhone, top=p._stack[p._stack.length-1];
+      var p=homePhone, top=p._stack[p._stack.length-1];
       if(top.id==='ring') return;
       var old=p.querySelector('.hu'); if(old) old.remove();
       var b=document.createElement('div');
@@ -2194,10 +2269,10 @@
     }
     function ring(ev){
       resumeAfter=playing; pause();
-      ringEv=ev; waitRing=alertsPhone;
-      alertsPhone._stack.push({id:'ring',data:{time:fmt(ev.min),title:ev.title,body:ev.body}});
-      render(alertsPhone);
-      try{ alertsPhone.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){ alertsPhone.scrollIntoView(); }
+      ringEv=ev; waitRing=homePhone;
+      homePhone._stack.push({id:'ring',data:{time:fmt(ev.min),title:ev.title,body:ev.body}});
+      render(homePhone);
+      try{ homePhone.scrollIntoView({behavior:'smooth',block:'center',inline:'center'}); }catch(e){ homePhone.scrollIntoView(); }
     }
 
     // 시계를 nt 로 옮긴다. fire 면 그 사이 알림을 띄운다 (기상 알람이 있으면 거기서 멈춤)
@@ -2236,7 +2311,7 @@
       audio.unlock();
       if(active) return;
       active=true;
-      // 실제 오늘 목록을 시연하는 날(이번 주 수요일) 목록으로 바꾼다
+      // 실제 오늘 목록을 시연하는 날 목록으로 바꾼다
       document.querySelectorAll('.phone').forEach(function(p){ if(p._stack[p._stack.length-1].id==='alerts') render(p); });
       refresh();
     }
@@ -2245,23 +2320,36 @@
     $('sim-next').addEventListener('click',function(){
       activate();
       var nx=all().filter(function(e){ return e.min>t; })[0];
-      if(!nx){ toast(alertsPhone,'오늘 알림은 모두 지나갔어요'); return; }
+      if(!nx){ toast(homePhone,'이날 알림은 모두 지나갔어요'); return; }
       advance(nx.min,true);
     });
     $('sim-reset').addEventListener('click',function(){
       activate();
-      pause(); waitRing=null; resumeAfter=false; extra=[]; t=START;
-      goTab(alertsPhone,'alerts');
-      refresh();
+      setDay(date);
+      goTab(homePhone,'home');
     });
+    $('sim-day').addEventListener('change',function(e){ activate(); setDay(new Date(+e.target.value)); });
     $('sim-sound').addEventListener('click',function(){ audio.setOn(!audio.isOn()); activate(); ui(); });
     $('sim-range').addEventListener('input',function(e){ activate(); advance(+e.target.value,false); });
     document.querySelectorAll('.sim [data-speed]').forEach(function(b){
       b.addEventListener('click',function(){ activate(); speed=+b.dataset.speed; ui(); });
     });
 
+    refreshDays();
+
     return {
       isActive:function(){ return active; },
+      day:function(){ return {date:date,later:later()}; },
+      refreshDays:refreshDays,
+      // 방금 등록한 날로 시연 날짜를 맞춘다 (매주 일정은 앞으로 처음 오는 날). 그 일정으로 생긴 날의 알림 개수를 돌려준다
+      pick:function(sd){
+        refreshDays();
+        var d=sd;
+        if(d<cal.today){ for(var i=0;i<7;i++){ var x=cal.add(cal.today,i); if(x.getDay()===sd.getDay()&&cal.ownEvents(x).length) d=x; } }
+        if(![].some.call($('sim-day').options,function(o){ return +o.value===d.getTime(); })) return 0;
+        setDay(d);
+        return EVENTS.length;
+      },
       decorate:decorate,
       // 알람 화면을 떠나면(끄기·5분 뒤) 시계를 다시 돌린다
       afterRender:function(phone){
@@ -2278,7 +2366,7 @@
         again.min=t+5; again.time=fmt(t+5); again.snooze=true;
         extra.push(again);
       },
-      state:function(){ return {t:fmt(t),playing:playing,speed:speed,active:active,extra:extra.length,ringing:audio.ringing(alertsPhone._id),audio:audio.state(),sound:audio.isOn()}; }
+      state:function(){ return {t:fmt(t),playing:playing,speed:speed,active:active,extra:extra.length,day:cal.full(date),min:MIN,max:MAX,ringing:audio.ringing(homePhone._id),audio:audio.state(),sound:audio.isOn()}; }
     };
   })();
   window.__gilmateSim=sim.state;  // 확인용 (시연 상태 읽기만)
