@@ -134,6 +134,7 @@
   .ev.own{box-shadow:0 0 0 1.5px #0b5a4a inset;}
   .ev.own.half{left:50%;}
   .wknav .arw{cursor:pointer;user-select:none;padding:8px 0;}
+  .clash{font-size:13px;font-weight:600;line-height:1.45;color:#9B1C1C;background:#FDECEC;border-radius:9px;padding:9px 11px;margin:0 0 10px;word-break:break-all;}
   .pl-row{display:flex;gap:6px;margin-top:8px;}
   .pl-row input.fv{flex:1;min-width:0;box-sizing:border-box;font-family:inherit;min-height:38px;border:1px solid #D5DAE2;border-radius:9px;padding:0 10px;background:#fff;}
   .pl-item{display:block;width:100%;text-align:left;border:1px solid #D5DAE2;border-radius:9px;background:#fff;padding:8px 10px;margin-top:6px;font-family:inherit;cursor:pointer;}
@@ -937,6 +938,7 @@
       <label class="fld" style="margin:9px 0 0;"><div class="fk">메모</div><input class="fv" name="memo" type="text" maxlength="100" placeholder="예: 중앙도서관 3층" autocomplete="off"></label>
     </div>
     <p class="small" style="margin:2px 2px 10px;">쓰는 내용은 이 브라우저에만 저장돼서 새로 고쳐도 남아요. 저장하면 일정 화면의 시간표에 들어가요.</p>
+    <p class="clash" data-clash role="alert" hidden></p>
     <button type="button" class="btn btn-fill btn-big" data-save-event>저장</button>
   </div>
 </template>
@@ -1738,6 +1740,40 @@
     form.querySelector('[data-place-list]').textContent='';
     clearSegs(form); saveDraft(phone);
   }
+  // 시간이 겹치는 일정 하나를 찾는다 (이동 시간은 보지 않는다). 쓰던 내용은 그대로 두고 저장만 막는다
+  var BUSY=(function(){
+    var out=[];
+    document.getElementById('v-schedule').content.querySelectorAll('.gcol').forEach(function(col,i){
+      col.querySelectorAll('.ev:not(.mv)').forEach(function(e){
+        var m=/(\d\d:\d\d)–(\d\d:\d\d)/.exec(e.dataset.when||'');
+        if(m) out.push({title:e.dataset.title,col:i,start:m[1],end:m[2],once:e.hasAttribute('data-once')});
+      });
+    });
+    return out;
+  })();
+  function clash(n){
+    function day(t){ var p=t.split('-'); return new Date(+p[0],+p[1]-1,+p[2]); }
+    var nd=day(n.date), weekly=n.repeat==='매주', found=null;
+    function over(a){ return a.start<n.end&&n.start<a.end; }
+    function set(a,d,every){ if(!found) found={title:a.title,when:(every?'매주 '+DOW[d.getDay()]+'요일':cal.full(d))+' '+a.start+'–'+a.end}; }
+    BUSY.forEach(function(b){
+      if(!over(b)||(nd.getDay()+6)%7!==b.col) return;
+      var bd=cal.add(cal.mon,b.col);
+      if(b.once){ if(bd.getTime()===nd.getTime()||(weekly&&bd>nd)) set(b,bd); return; }
+      // 수업은 학기 안에서만
+      if(cal.inTerm(nd)||(weekly&&nd<cal.mon)) set(b,nd,true);
+    });
+    loadEvents().forEach(function(x){
+      var xd=day(x.date);
+      if(isNaN(xd.getTime())||!over(x)||xd.getDay()!==nd.getDay()) return;
+      var xw=x.repeat==='매주';
+      if(xw&&weekly) set(x,xd,true);
+      else if(xw){ if(nd>=xd) set(x,xd,true); }
+      else if(weekly){ if(xd>=nd) set(x,xd); }
+      else if(xd.getTime()===nd.getTime()) set(x,xd);
+    });
+    return found;
+  }
   function saveEvent(phone){
     var form=phone.querySelector('[data-form="new"]');
     if(!form) return;
@@ -1749,6 +1785,13 @@
     if(d.end<=d.start){ toast(phone,'종료 시각이 시작보다 늦어야 해요'); return; }
     // 검색 칸에 적은 곳이 있으면 그곳, 없으면 고른 집·학교
     d.place=(d.placeq||'').trim().slice(0,40)||d.place;
+    var hit=clash(d);
+    if(hit){
+      var msg='‘'+hit.title+'’ '+hit.when+'와 겹쳐요. 날짜나 시간을 바꿔 주세요.', box=phone.querySelector('[data-clash]');
+      box.textContent=msg; box.hidden=false;
+      box.scrollIntoView({block:'nearest'});
+      return;
+    }
     var list=loadEvents();
     list.push({title:d.title,date:d.date,start:d.start,end:d.end,repeat:d.repeat,place:d.place,memo:d.memo,at:Date.now()});
     store.set(KEY_EVENTS,list);
@@ -1969,7 +2012,7 @@
         if(pq){ pq.value=''; pf._pq=(pf._pq||0)+1; pf.querySelector('[data-place-list]').textContent=''; }
       }
       if(el.dataset.snd) toast(phone,'소리: '+el.dataset.snd);
-      if(el.closest('[data-form]')) saveDraft(phone);
+      if(el.closest('[data-form]')){ saveDraft(phone); var cb=phone.querySelector('[data-clash]'); if(cb) cb.hidden=true; }
       return;
     }
     if(el.hasAttribute('data-save-event')){ saveEvent(phone); return; }
@@ -2058,7 +2101,7 @@
       f._pq=(f._pq||0)+1; f.querySelector('[data-place-list]').textContent='';
       if(e.target.value.trim()) clearSegs(f);
     }
-    if(phone&&e.target.closest('[data-form]')) saveDraft(phone);
+    if(phone&&e.target.closest('[data-form]')){ saveDraft(phone); var cb=phone.querySelector('[data-clash]'); if(cb) cb.hidden=true; }
   });
   // 맨 아래 「기록 모두 지우기」: 한 번 더 묻고, gilmate. 로 시작하는 저장만 지운 뒤 처음 안내를 보여 준다
   var wipe=document.getElementById('wipe-records');
